@@ -360,7 +360,7 @@ async function doLogin(){
     const j=await r.json();
     if(j.success){
       document.getElementById('wName').textContent=j.name;
-      document.getElementById('wChip').textContent='🎓 '+j.enrollment+' · '+j.department;
+      document.getElementById('wChip').textContent='Work in Progress'+j.enrollment+' · '+j.department;
       document.getElementById('formArea').style.display='none';
       document.getElementById('welcomeView').classList.add('show');
     }else{sa('loginErr','❌ '+(j.message||'Invalid credentials.'));btn.textContent='Sign In →';btn.disabled=false;}
