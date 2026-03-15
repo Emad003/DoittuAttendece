@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DoIT — Register</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -171,6 +172,8 @@ select option{background:#fff;color:var(--text)}
 .shake{animation:shake .35s ease}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 </style>
+<!-- font awesome -->
+<script src="https://kit.fontawesome.com/7616ca1c55.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="grid-bg"></div>
@@ -216,12 +219,12 @@ select option{background:#fff;color:var(--text)}
 
         <!-- CARD 1: Personal -->
         <div class="f-card">
-          <div class="f-card-title">👤 Personal Info</div>
+          <div class="f-card-title">Personal Info</div>
           <div class="form-grid">
 
             <div class="fg full">
               <label>Full Name</label>
-              <div class="iw"><span class="ii">✏️</span>
+              <div class="iw"><i class="fa-regular fa-address-card ii"></i>
                 <input type="text" id="fn" placeholder="Your full name" autocomplete="off">
               </div>
               <span class="err-msg" id="fnErr">⚠ Letters only, 2–60 characters.</span>
@@ -239,7 +242,7 @@ select option{background:#fff;color:var(--text)}
 
             <div class="fg">
               <label>Password</label>
-              <div class="iw"><span class="ii">🔒</span>
+              <div class="iw"> <i class="fa-solid fa-key ii"></i>
                 <input type="password" id="pwd" placeholder="Min 8 chars" oninput="strCheck(this.value)">
                 <button class="eye-btn" type="button" onclick="tog('pwd',this)">👁</button>
               </div>
@@ -249,7 +252,7 @@ select option{background:#fff;color:var(--text)}
 
             <div class="fg">
               <label>Enrollment No.</label>
-              <div class="iw"><span class="ii">🪪</span>
+              <div class="iw"><i class="fa-brands fa-orcid ii"></i>
                 <input type="text" id="enroll" placeholder="eg. 24230" autocomplete="off">
               </div>
               <span class="err-msg" id="enrollErr">⚠ Enrollment number required.</span>
@@ -267,7 +270,7 @@ select option{background:#fff;color:var(--text)}
               <div class="iw"><span class="ii">✉</span>
                 <input type="email" id="em" placeholder="your@email.com" autocomplete="off">
               </div>
-              <button type="button" class="btn-otp" id="btnOtp" onclick="sendOtp()">📨 Send OTP</button>
+              <button type="button" class="btn-otp" id="btnOtp" onclick="sendOtp()">Send OTP</button>
             </div>
             <span class="err-msg" id="emErr">⚠ Enter a valid email.</span>
             <div class="alert aw" id="dupAlert">⚠️ Email already registered. <a href="login.html" style="color:var(--b2)">Sign in?</a></div>
@@ -287,12 +290,12 @@ select option{background:#fff;color:var(--text)}
 
         <!-- CARD 3: Academic -->
         <div class="f-card">
-          <div class="f-card-title">🏛 Academic Details</div>
+          <div class="f-card-title">Academic Details</div>
           <div class="form-grid">
 
             <div class="fg">
               <label>Department</label>
-              <div class="sel-wrap iw"><span class="ii">🏛</span>
+              <div class="sel-wrap iw"><span class="fa-graphite fa-thin fa-building ii">🏛</span>
                 <select id="dept">
                   <option value="" disabled selected>Select</option>
                   <option value="CSE">CSE</option>
@@ -305,7 +308,7 @@ select option{background:#fff;color:var(--text)}
 
             <div class="fg">
               <label>Course</label>
-              <div class="sel-wrap iw"><span class="ii">📚</span>
+              <div class="sel-wrap iw"> <i class="fa-solid fa-c ii"></i>
                 <select id="course">
                   <option value="" disabled selected>Select</option>
                   <option value="MCA">MCA</option>
@@ -317,7 +320,7 @@ select option{background:#fff;color:var(--text)}
 
             <div class="fg">
               <label>Year</label>
-              <div class="sel-wrap iw"><span class="ii">📆</span>
+              <div class="sel-wrap iw"><i class="fa-solid fa-calendar-days ii"></i>
                 <select id="yr" onchange="updateSem()">
                   <option value="" disabled selected>Select</option>
                   <option value="1st">1st Year</option>
@@ -329,7 +332,7 @@ select option{background:#fff;color:var(--text)}
 
             <div class="fg">
               <label>Semester</label>
-              <div class="sel-wrap iw"><span class="ii">📅</span>
+              <div class="sel-wrap iw"> <i class="fa-sharp fa-solid fa-s ii"></i>
                 <select id="sem" disabled>
                   <option value="" disabled selected>Select year first</option>
                 </select>
@@ -342,7 +345,7 @@ select option{background:#fff;color:var(--text)}
 
         <!-- SUBMIT -->
         <div class="submit-area">
-          <button type="submit" class="btn-main" id="subBtn" disabled>🔒 Verify Email to Register</button>
+          <button type="submit" class="btn-main" id="subBtn" disabled><i class="fa-etch fa-solid fa-lock"></i> Verify Email to Register</button>
           <div class="login-row">Already registered? <a href="login.html">Sign in here</a></div>
         </div>
 
