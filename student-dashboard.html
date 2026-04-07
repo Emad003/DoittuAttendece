@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOIT — Student Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#0f4fa8;--primary-light:#1a6fd4;--primary-lighter:#3d8ef0;--primary-pale:#c8dffe;
+  --bg:#f5f7fb;--white:#fff;--text:#1a1f36;--text-secondary:#5a6a8a;
+  --border:#e2e8f0;--danger:#dc2626;--success:#059669;--warning:#d97706;
+  --glass:rgba(255,255,255,0.85);--shadow-sm:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06);
+  --shadow-md:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.04);
+  --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.06),0 4px 6px -2px rgba(0,0,0,0.04);
+  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;
+}
+body{min-height:100vh;background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);line-height:1.5}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:10;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:72px}
+.nav-brand{display:flex;align-items:center;gap:14px}
+.nav-logo{height:52px;width:auto;border-radius:var(--radius-sm);background:var(--white);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;flex-shrink:0;box-shadow:var(--shadow-sm)}
+.nav-logo img{height:46px;width:auto;object-fit:contain}
+.nav-title{display:flex;flex-direction:column;justify-content:center}
+.nav-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
+.nav-name span{color:var(--primary)}
+.nav-subtitle{font-size:10px;font-weight:600;color:var(--text-secondary);letter-spacing:.4px;margin-top:1px}
+.nav-divider{width:1px;height:36px;background:var(--border);margin:0 6px;flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-user{font-size:13px;font-weight:600;color:var(--text-secondary)}
+.nav-user b{color:var(--text)}
+.btn-logout{padding:8px 18px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--danger);color:var(--danger);background:#fef2f2}
+.btn-attend{padding:8px 18px;background:linear-gradient(135deg,var(--primary),var(--primary-light));border:none;border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--white);cursor:pointer;transition:all .25s;box-shadow:0 2px 8px rgba(15,79,168,0.25)}
+.btn-attend:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,79,168,0.35)}
+.btn-attend:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* HAMBURGER */
+.hamburger{display:none;background:none;border:none;cursor:pointer;padding:8px;margin-right:8px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--text);margin:5px 0;border-radius:2px;transition:all .3s}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+.mobile-menu{position:fixed;top:72px;left:10px;right:10px;max-width:400px;margin:0 auto;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:16px;box-shadow:0 10px 40px rgba(0,0,0,0.15);z-index:200;display:none;flex-direction:column;gap:10px;opacity:0;transform:translateY(-10px);transition:all .3s ease}
+.mobile-menu.show{display:flex;opacity:1;transform:translateY(0)}
+.mobile-menu-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;opacity:0;transition:opacity .3s}
+.mobile-menu-overlay.show{display:block;opacity:1}
+.mobile-menu button{width:100%;text-align:left;padding:16px 22px;border:none;border-radius:var(--radius-lg);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:16px}
+.mobile-menu .btn-attend{background:linear-gradient(135deg,#0f4fa8,#2563eb);color:var(--white);justify-content:center;box-shadow:0 4px 15px rgba(15,79,168,0.4)}
+.mobile-menu .btn-attend:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,79,168,0.5)}
+.mobile-menu .btn-logout{background:linear-gradient(135deg,#fef2f2,#fee2e2);color:#dc2626;border:1px solid #fecaca}
+.mobile-menu .btn-logout:hover{background:linear-gradient(135deg,#fee2e2,#fecaca);border-color:#dc2626;transform:translateY(-2px);box-shadow:0 4px 12px rgba(220,38,38,0.2)}
+.mobile-menu .user-info{font-size:15px;font-weight:700;color:var(--text);padding:16px 4px;text-align:center;border-bottom:1px solid var(--border);margin-bottom:8px}
+.mobile-menu .user-info b{color:var(--primary)}
+
+/* BG */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle at 20% 50%,rgba(15,79,168,0.04) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(15,79,168,0.03) 0%,transparent 40%)}
+.main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:36px 24px 60px}
+
+/* WARNINGS */
+.warn-banner{border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px;display:flex;align-items:flex-start;gap:14px;animation:slideIn .4s ease}
+.warn-banner.critical{background:linear-gradient(135deg,#fef2f2,#fff);border:1px solid #fecaca;box-shadow:0 2px 8px rgba(220,38,38,0.08)}
+.warn-banner.warning{background:linear-gradient(135deg,#fffbeb,#fff);border:1px solid #fed7aa;box-shadow:0 2px 8px rgba(217,119,6,0.08)}
+.warn-icon{font-size:18px;flex-shrink:0;margin-top:2px}
+.warn-banner.critical .warn-icon{color:var(--danger)}
+.warn-banner.warning .warn-icon{color:var(--warning)}
+.warn-text .wt{font-size:14px;font-weight:700;margin-bottom:3px}
+.warn-banner.critical .warn-text .wt{color:var(--danger)}
+.warn-banner.warning .warn-text .wt{color:var(--warning)}
+.warn-text .ws{font-size:13px;font-weight:500;color:var(--text-secondary);line-height:1.5}
+#warningSection{margin-bottom:20px}
+
+/* WELCOME BANNER */
+.welcome-banner{background:linear-gradient(135deg,#0f4fa8 0%,#1a6fd4 50%,#2563eb 100%);border-radius:var(--radius-xl);padding:32px 36px;margin-bottom:28px;color:var(--white);position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(15,79,168,0.25)}
+.welcome-banner::before{content:'';position:absolute;width:320px;height:320px;border-radius:50%;background:linear-gradient(135deg,rgba(255,255,255,0.1),rgba(255,255,255,0.03));top:-140px;right:-100px}
+.welcome-banner::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.05);bottom:-60px;left:80px}
+.wb-top{position:relative;z-index:1}
+.wb-greeting{font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);margin-bottom:4px;letter-spacing:0.5px}
+.wb-name{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--white);margin-bottom:12px;letter-spacing:-0.5px}
+.wb-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.wb-chip{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:50px;padding:5px 14px;font-size:11.5px;font-weight:600;color:rgba(255,255,255,0.92)}
+.wb-date{position:absolute;top:32px;right:36px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.72);z-index:1}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+@media(max-width:720px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 20px;box-shadow:var(--shadow-md);text-align:center;transition:transform .2s,box-shadow .2s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.stat-icon{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:var(--radius-md);margin-bottom:12px;font-size:20px}
+.stat-card.blue .stat-icon{background:linear-gradient(135deg,#eff6ff,#dbeafe);color:var(--primary)}
+.stat-card.green .stat-icon{background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:var(--success)}
+.stat-card.red .stat-icon{background:linear-gradient(135deg,#fef2f2,#fee2e2);color:var(--danger)}
+.stat-card.purple .stat-icon{background:linear-gradient(135deg,#f5f3ff,#ede9fe);color:#7c3aed}
+.stat-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--text);line-height:1}
+.stat-lbl{font-size:11px;font-weight:700;color:var(--text-secondary);margin-top:6px;text-transform:uppercase;letter-spacing:1px}
+.stat-card.green .stat-val{color:var(--success)}
+.stat-card.red .stat-val{color:var(--danger)}
+.stat-card.blue .stat-val{color:var(--primary)}
+
+/* ATTENDANCE BAR */
+.pct-bar-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 28px;margin-bottom:28px;box-shadow:var(--shadow-md)}
+.pct-bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.pct-bar-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+.pct-bar-title i{font-size:16px}
+.pct-badge{font-size:28px;font-weight:800;font-family:'Syne',sans-serif}
+.pct-bar-bg{height:10px;background:#f1f5f9;border-radius:99px;overflow:hidden}
+.pct-bar-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.pct-note{font-size:13px;color:var(--text-secondary);font-weight:500;margin-top:10px;display:flex;align-items:center;gap:6px}
+.pct-note i{font-size:12px}
+
+/* CARDS */
+.dash-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 26px;box-shadow:var(--shadow-md);margin-bottom:28px}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.card-title i{color:var(--primary);font-size:16px}
+.card-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+
+/* TODAY CLASSES */
+.today-subject{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-radius:var(--radius-md);background:var(--bg);margin-bottom:10px;border:1px solid transparent;transition:all .2s}
+.today-subject:last-child{margin-bottom:0}
+.today-subject:hover{background:var(--white);border-color:var(--border);box-shadow:var(--shadow-sm)}
+.ts-name{font-size:14px;font-weight:700;color:var(--text)}
+.ts-code{font-size:12px;font-weight:500;color:var(--text-secondary);margin-top:2px}
+.ts-time{font-size:11px;font-weight:600;color:var(--primary);margin-top:3px}
+.ts-badge{padding:6px 14px;border-radius:50px;font-size:11.5px;font-weight:700;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px}
+.ts-badge.present{background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:var(--success);border:1px solid #a7f3d0}
+.ts-badge.absent{background:linear-gradient(135deg,#fef2f2,#fee2e2);color:var(--danger);border:1px solid #fecaca}
+.ts-badge.pending{background:linear-gradient(135deg,#f8fafc,#f1f5f9);color:var(--text-secondary);border:1px solid var(--border)}
+.ts-badge i{font-size:10px}
+
+/* SUBJECT WISE */
+.subj-stat{border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:12px;overflow:hidden;background:var(--white)}
+.subj-stat:last-child{margin-bottom:0}
+.subj-stat-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;transition:background .2s;gap:16px}
+.subj-stat-head:hover{background:#f8fafc}
+.subj-name{font-size:14px;font-weight:700;color:var(--text)}
+.subj-meta{font-size:12px;font-weight:500;color:var(--text-secondary);margin-top:2px}
+.subj-pct{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;flex-shrink:0}
+.subj-bar-wrap{padding:0 20px}
+.subj-bar-bg{height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;margin:8px 0}
+.subj-bar-fill{height:100%;border-radius:99px;transition:width 1s ease}
+.subj-counts{display:flex;gap:18px;font-size:12px;font-weight:600;padding:0 20px 14px;flex-wrap:wrap}
+.subj-counts span{display:flex;align-items:center;gap:4px}
+.subj-counts .c-present{color:var(--success)}
+.subj-counts .c-absent{color:var(--danger)}
+.subj-counts .c-total{color:var(--text-secondary)}
+.subj-detail{display:none;border-top:1px solid var(--border);background:#fafbfc;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.subj-detail.open{display:block}
+.subj-detail table{width:100%;border-collapse:collapse;min-width:350px}
+.subj-detail th{font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;padding:12px 20px;border-bottom:1px solid var(--border);text-align:left;background:var(--white);white-space:nowrap}
+.subj-detail td{font-size:13px;font-weight:600;color:var(--text);padding:12px 20px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+.subj-detail tr:last-child td{border-bottom:none}
+.subj-chevron{font-size:12px;color:var(--text-secondary);transition:transform .25s;flex-shrink:0}
+.subj-chevron.open{transform:rotate(180deg)}
+
+/* HISTORY */
+.history-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.history-table{width:100%;border-collapse:collapse;min-width:400px}
+.history-table th{font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;padding:12px 16px;border-bottom:1px solid var(--border);text-align:left;background:#fafbfc;white-space:nowrap}
+.history-table td{font-size:13px;font-weight:600;color:var(--text);padding:14px 16px;border-bottom:1px solid #f1f5f9;white-space:nowrap}
+.history-table tr:last-child td{border-bottom:none}
+.history-table tr:hover td{background:#fafbfc}
+.h-badge{padding:5px 12px;border-radius:50px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px}
+.h-badge.present{background:linear-gradient(135deg,#ecfdf5,#d1fae5);color:var(--success)}
+.h-badge.absent{background:linear-gradient(135deg,#fef2f2,#fee2e2);color:var(--danger)}
+.h-badge i{font-size:9px}
+
+/* WEEKEND */
+.weekend-empty{text-align:center;padding:36px}
+.weekend-empty .we-icon{font-size:48px;margin-bottom:12px;color:var(--primary-pale)}
+.weekend-empty .we-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:4px}
+.weekend-empty .we-desc{font-size:13px;color:var(--text-secondary);font-weight:500}
+
+/* MISC */
+.loading{text-align:center;padding:32px;color:var(--text-secondary);font-size:14px;font-weight:600}
+.spin{display:inline-block;width:22px;height:22px;border:2.5px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin-right:8px;vertical-align:middle}
+.empty{text-align:center;padding:28px;color:var(--text-secondary);font-size:14px;font-weight:500;line-height:1.6}
+.empty i{font-size:32px;display:block;margin-bottom:10px;color:var(--border)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  nav{padding:0 16px;height:64px}
+  .nav-user{display:none}
+  .nav-subtitle{display:none}
+  .nav-divider{display:none}
+  .nav-logo{height:42px}
+  .nav-logo img{height:38px}
+  .nav-name{font-size:17px}
+  .hamburger{display:block}
+  .nav-right{display:none}
+  .mobile-menu{top:64px}
+  .main{padding:20px 14px 40px}
+  .welcome-banner{padding:24px 20px;border-radius:var(--radius-lg)}
+  .wb-name{font-size:22px}
+  .wb-date{display:none}
+  .wb-chips{gap:6px}
+  .wb-chip{font-size:10.5px;padding:4px 11px}
+  .stats-grid{gap:12px}
+  .stat-card{padding:18px 14px}
+  .stat-val{font-size:26px}
+  .stat-lbl{font-size:9.5px}
+  .pct-bar-wrap{padding:18px 20px}
+  .dash-card{padding:18px 20px;border-radius:var(--radius-md)}
+  .card-title{font-size:13px}
+  .today-subject{padding:12px 14px}
+  .ts-name{font-size:13px}
+  .subj-stat-head{padding:14px 16px}
+  .btn-attend,.btn-logout{padding:7px 14px;font-size:12px}
+}
+
+/* NO CLASSES TODAY */
+.no-class-banner{display:flex;align-items:center;gap:16px;padding:24px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border-radius:var(--radius-md);border:1px solid var(--border)}
+.nc-icon{width:56px;height:56px;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px;color:#4f46e5}
+.nc-text{flex:1}
+.nc-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)}
+.nc-desc{font-size:13px;color:var(--text-secondary);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="nav-brand">
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-logo"><img src="logo.png" alt="TU Logo"></div>
+    <div class="nav-divider"></div>
+    <div class="nav-title">
+      <div class="nav-name">DO<span>IT</span></div>
+      <div class="nav-subtitle">Dept. of Information Technology · Tripura University</div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-user">Welcome, <b id="navName">Student</b></div>
+    <button class="btn-attend" id="btnAttend" onclick="location.href='attendance.html'"><i class="fa-solid fa-camera" style="color:#fff"></i> Mark Attendance</button>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</nav>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <div class="user-info">Welcome, <b id="mobileNavName">Student</b></div>
+  <button class="btn-attend" id="mobileBtnAttend" onclick="location.href='attendance.html'"><i class="fa-solid fa-camera"></i> Mark Attendance</button>
+  <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+</div>
+
+<div class="main">
+
+  <!-- WARNING BANNERS -->
+  <div id="warningSection"></div>
+
+  <!-- WELCOME BANNER -->
+  <div class="welcome-banner">
+    <div class="wb-date" id="wbDate"></div>
+    <div class="wb-top">
+      <div class="wb-greeting" id="wbGreeting"><i class="fa-solid fa-hand-sparkles"></i> Good day</div>
+      <div class="wb-name" id="wbName">Loading...</div>
+      <div class="wb-chips">
+        <div class="wb-chip" id="wbEnroll"><i class="fa-solid fa-id-card"></i> —</div>
+        <div class="wb-chip" id="wbDept"><i class="fa-solid fa-building-columns"></i> —</div>
+        <div class="wb-chip" id="wbCourse"><i class="fa-solid fa-graduation-cap"></i> —</div>
+        <div class="wb-chip" id="wbSem"><i class="fa-solid fa-calendar-days"></i> —</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card blue"><div class="stat-icon"><i class="fa-solid fa-book"></i></div><div class="stat-val" id="statTotal">—</div><div class="stat-lbl">Total Classes</div></div>
+    <div class="stat-card green"><div class="stat-icon"><i class="fa-solid fa-check-circle"></i></div><div class="stat-val" id="statPresent">—</div><div class="stat-lbl">Present</div></div>
+    <div class="stat-card red"><div class="stat-icon"><i class="fa-solid fa-xmark-circle"></i></div><div class="stat-val" id="statAbsent">—</div><div class="stat-lbl">Absent</div></div>
+    <div class="stat-card purple"><div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div><div class="stat-val" id="statToday">—</div><div class="stat-lbl">Today</div></div>
+  </div>
+  <!-- % BAR -->
+  <div class="pct-bar-wrap">
+    <div class="pct-bar-top">
+      <div class="pct-bar-title"><i class="fa-solid fa-chart-pie"></i> Overall Attendance</div>
+      <div class="pct-badge" id="pctVal">—%</div>
+    </div>
+    <div class="pct-bar-bg"><div class="pct-bar-fill" id="pctFill" style="width:0%"></div></div>
+    <div class="pct-note" id="pctNote"><i class="fa-solid fa-circle-info"></i> Loading attendance data...</div>
+  </div>
+
+  <!-- TODAY'S CLASSES -->
+  <div class="dash-card">
+    <div class="card-title"><i class="fa-solid fa-calendar-day"></i> Today's Classes</div>
+    <div id="todayList"><div class="loading"><span class="spin"></span>Loading...</div></div>
+  </div>
+
+  <!-- SUBJECT WISE -->
+  <div class="dash-card">
+    <div class="card-title"><i class="fa-solid fa-chart-simple"></i> Subject Wise Attendance</div>
+    <div id="subjectWiseList"><div class="loading"><span class="spin"></span>Loading...</div></div>
+  </div>
+
+  <!-- RECENT HISTORY -->
+  <div class="dash-card">
+    <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Attendance History</div>
+    <div class="history-wrap" id="historyList"><div class="loading"><span class="spin"></span>Loading...</div></div>
+  </div>
+
+</div>
+
+<script>
+// ── CONSISTENT DATE FORMAT ──
+function formatDate(date){
+  const d = date || new Date();
+  const day   = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const year  = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
+// ── NORMALIZE DATE from sheet (handles ISO and dd/mm/yyyy) ──
+function normalizeDate(dateStr){
+  if(!dateStr) return '';
+  // If ISO datetime: "2026-03-22T18:30:00.000Z"
+  // Use LOCAL date parts to avoid UTC timezone shift (IST = UTC+5:30)
+  if(dateStr.includes('T')){
+    const d = new Date(dateStr);
+    if(!isNaN(d.getTime())){
+      const day   = String(d.getDate()).padStart(2,'0');
+      const month = String(d.getMonth()+1).padStart(2,'0');
+      const year  = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+  }
+  // ISO date without time: "2026-03-22"
+  if(dateStr.includes('-') && !dateStr.includes('/')){
+    const parts = dateStr.split('-');
+    if(parts.length === 3){
+      return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
+    }
+  }
+  // Already dd/mm/yyyy — ensure leading zeros
+  const parts = dateStr.split('/');
+  if(parts.length === 3){
+    return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`;
+  }
+  return dateStr;
+}
+
+// ── NORMALIZE TIME ──
+function normalizeTime(timeStr){
+  if(!timeStr) return '—';
+  if(timeStr.includes('T')){
+    const d = new Date(timeStr);
+    if(!isNaN(d.getTime())){
+      return d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+    }
+  }
+  return timeStr;
+}
+
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxq77REqZDT2ZZUk-bA0S9jjI7BSjnt_cZ3cBxutOrGubRd0lkBY1ArDpiWf8PCGe_m/exec';
+
+// ── TIMETABLE ──
+const TIMETABLE = {
+  'MCA':{
+    '1st Semester':{
+      'Mon':[{code:'MCA0103C',name:'Computer Organization & Assembly Language Programming'},{code:'MCA0102C',name:'Programming in C'}],
+      'Tue':[{code:'CSK-III',name:'Computer Skill-III'},{code:'MCA0105C',name:'Assembly Language Laboratory'}],
+      'Wed':[{code:'MCA0101C',name:'Mathematical Foundations of Computer Applications'},{code:'MCA0103C',name:'Computer Organization & Assembly Language Programming'},{code:'MCA0104C',name:'Programming Laboratory'}],
+      'Thu':[{code:'CSK-III',name:'Computer Skill-III'},{code:'MCA0101C',name:'Mathematical Foundations of Computer Applications'},{code:'MCA0104C',name:'Programming Laboratory'}],
+      'Fri':[{code:'MCA0102C',name:'Programming in C'},{code:'MCA0105C',name:'Assembly Language Laboratory'}],
+      'Sat':[],'Sun':[]
+    },
+    '2nd Semester':{
+      'Mon':[{code:'MCA0201C',name:'Data Structures'},{code:'MCA0202C',name:'Object Oriented Programming'}],
+      'Tue':[{code:'MCA0203C',name:'Operating Systems'},{code:'MCA0204C',name:'Discrete Mathematics'}],
+      'Wed':[{code:'MCA0201C',name:'Data Structures'},{code:'MCA0205C',name:'Data Structures Laboratory'}],
+      'Thu':[{code:'MCA0202C',name:'Object Oriented Programming'},{code:'MCA0206C',name:'OOP Laboratory'}],
+      'Fri':[{code:'MCA0203C',name:'Operating Systems'},{code:'MCA0204C',name:'Discrete Mathematics'}],
+      'Sat':[],'Sun':[]
+    },
+    '3rd Semester':{
+      'Mon':[{code:'MCA0305C',name:'Project Phase I'},{code:'MCA0303C',name:'Database Management Systems Laboratory'},{code:'MCA0010E',name:'Elective I'},{code:'MCA0015E',name:'Elective II'}],
+      'Tue':[{code:'MCA0301C',name:'Database Management Systems'},{code:'MCA0010E',name:'Elective I'},{code:'MCA0015E',name:'Elective II'},{code:'MCA0305C',name:'Project Phase I'}],
+      'Wed':[{code:'MCA0305C',name:'Project Phase I'},{code:'MCA0302C',name:'Data Communication & Computer Network'},{code:'MCA0304C',name:'Computer Network Laboratory'},{code:'MCA0010E',name:'Elective I'}],
+      'Thu':[{code:'MCA0305C',name:'Project Phase I'},{code:'MCA0302C',name:'Data Communication & Computer Network'},{code:'MCA0304C',name:'Computer Network Laboratory'}],
+      'Fri':[{code:'MCA0303C',name:'Database Management Systems Laboratory'},{code:'MCA0015E',name:'Elective II'},{code:'MCA0301C',name:'Database Management Systems'},{code:'MCA0305C',name:'Project Phase I'}],
+      'Sat':[],'Sun':[]
+    },
+    '4th Semester':{
+      'Mon':[{code:'MCA0401C',name:'Software Engineering'},{code:'MCA0402C',name:'Cloud Computing'}],
+      'Tue':[{code:'MCA0403C',name:'Elective III'},{code:'MCA0405C',name:'Project Phase II'}],
+      'Wed':[{code:'MCA0401C',name:'Software Engineering'},{code:'MCA0404C',name:'Elective IV'}],
+      'Thu':[{code:'MCA0402C',name:'Cloud Computing'},{code:'MCA0405C',name:'Project Phase II'}],
+      'Fri':[{code:'MCA0403C',name:'Elective III'},{code:'MCA0404C',name:'Elective IV'}],
+      'Sat':[],'Sun':[]
+    }
+  },
+  'M.Tech':{
+    '1st Semester':{
+      'Mon':[{code:'MT101',name:'Advanced Algorithms'},{code:'MT102',name:'Research Methodology'}],
+      'Tue':[{code:'MT103',name:'Advanced Networks'},{code:'MT104',name:'Embedded Systems'}],
+      'Wed':[{code:'MT101',name:'Advanced Algorithms'},{code:'MT105',name:'Digital Signal Processing'}],
+      'Thu':[{code:'MT102',name:'Research Methodology'},{code:'MT104',name:'Embedded Systems'}],
+      'Fri':[{code:'MT103',name:'Advanced Networks'},{code:'MT105',name:'Digital Signal Processing'}],
+      'Sat':[],'Sun':[]
+    },
+    '2nd Semester':{
+      'Mon':[{code:'MT201',name:'Machine Learning'},{code:'MT202',name:'VLSI Design'}],
+      'Tue':[{code:'MT203',name:'Advanced DBMS'},{code:'MT204',name:'Wireless Networks'}],
+      'Wed':[{code:'MT201',name:'Machine Learning'},{code:'MT205',name:'Seminar'}],
+      'Thu':[{code:'MT202',name:'VLSI Design'},{code:'MT203',name:'Advanced DBMS'}],
+      'Fri':[{code:'MT204',name:'Wireless Networks'},{code:'MT205',name:'Seminar'}],
+      'Sat':[],'Sun':[]
+    },
+    '3rd Semester':{
+      'Mon':[{code:'MT301',name:'Dissertation Phase I'},{code:'MT302',name:'Elective I'}],
+      'Tue':[{code:'MT301',name:'Dissertation Phase I'},{code:'MT303',name:'Elective II'}],
+      'Wed':[{code:'MT301',name:'Dissertation Phase I'},{code:'MT302',name:'Elective I'}],
+      'Thu':[{code:'MT301',name:'Dissertation Phase I'},{code:'MT303',name:'Elective II'}],
+      'Fri':[{code:'MT301',name:'Dissertation Phase I'}],
+      'Sat':[],'Sun':[]
+    },
+    '4th Semester':{
+      'Mon':[{code:'MT401',name:'Dissertation Phase II'}],
+      'Tue':[{code:'MT401',name:'Dissertation Phase II'}],
+      'Wed':[{code:'MT401',name:'Dissertation Phase II'}],
+      'Thu':[{code:'MT401',name:'Dissertation Phase II'}],
+      'Fri':[{code:'MT401',name:'Dissertation Phase II'}],
+      'Sat':[],'Sun':[]
+    }
+  }
+};
+
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+// ── AUTH ──
+const student = JSON.parse(localStorage.getItem('student')||'null');
+if(!student){ window.location.href='login.html'; }
+
+// ── GREETING ──
+function getGreeting(){
+  const h = new Date().getHours();
+  if(h<12) return '<i class="fa-solid fa-sun"></i> Good morning';
+  if(h<17) return '<i class="fa-solid fa-cloud-sun"></i> Good afternoon';
+  return '<i class="fa-solid fa-moon"></i> Good evening';
+}
+
+// ── DATE ──
+const now = new Date();
+const todayDay = now.getDay();
+const todayDayName = DAY_NAMES[todayDay];
+const todayEnIN = formatDate(now);
+
+// Populate UI
+document.getElementById('wbDate').textContent = now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('wbGreeting').innerHTML = getGreeting();
+document.getElementById('navName').textContent = student.name.split(' ')[0];
+document.getElementById('wbName').textContent = student.name;
+document.getElementById('wbEnroll').innerHTML = '<i class="fa-solid fa-id-card"></i> '+student.enrollment;
+document.getElementById('wbDept').innerHTML = '<i class="fa-solid fa-building-columns"></i> '+student.department;
+document.getElementById('wbCourse').innerHTML = '<i class="fa-solid fa-graduation-cap"></i> '+student.course;
+document.getElementById('wbSem').innerHTML = '<i class="fa-solid fa-calendar-days"></i> '+student.semester;
+
+// ── BUTTON — day aware ──
+const todayDayIdx = now.getDay();
+const btnAttend = document.getElementById('btnAttend');
+if(todayDayIdx === 0 || todayDayIdx === 6){
+  btnAttend.disabled = true;
+  btnAttend.innerHTML = '<i class="fa-solid fa-party-horn"></i> No Classes Today';
+  btnAttend.style.opacity = '0.6';
+  btnAttend.style.cursor = 'not-allowed';
+} else {
+  btnAttend.innerHTML = '<i class="fa-solid fa-camera"></i> Mark Attendance';
+}
+
+// ── AUTO REFRESH every 60 seconds ──
+setInterval(loadDashboard, 60000);
+
+// ── SUBJECT HELPERS ──
+function getSemTimetable(){
+  return (TIMETABLE[student.course]||{})[student.semester];
+}
+function getAllSubjects(){
+  const tt = getSemTimetable();
+  if(!tt||tt==='coming_soon') return [];
+  const seen=new Set(), subjects=[];
+  Object.values(tt).forEach(day=>{
+    if(!Array.isArray(day)) return;
+    day.forEach(s=>{ if(!seen.has(s.code)){seen.add(s.code);subjects.push(s);} });
+  });
+  return subjects;
+}
+
+// ── LOAD DATA ──
+async function loadDashboard(){
+  try{
+    const r = await fetch(SHEET_URL+'?action=getAllAttendance');
+    if(!r.ok) throw new Error('Server error '+r.status);
+    const j = await r.json();
+    if(j.error) throw new Error(j.error);
+
+    // Filter this student's records only
+    // Normalize dates and times first
+    const mine = (j.records||[])
+      .filter(rec => rec.enrollment.toString().trim()===student.enrollment.toString().trim())
+      .map(rec => ({
+        ...rec,
+        date: normalizeDate(rec.date),
+        time: normalizeTime(rec.time)
+      }));
+
+    // Stats — use actual records as ground truth
+    const total   = mine.length;
+    const present = mine.filter(r=>r.status==='Present').length;
+    const absent  = total - present;
+    const todayRecs = mine.filter(r=>r.date===todayEnIN);
+
+    // Show 0 on weekends for Today card
+    const todayCount = (todayDayIdx === 0 || todayDayIdx === 6) ? 0 : todayRecs.length;
+
+    document.getElementById('statTotal').textContent   = total;
+    document.getElementById('statPresent').textContent = present;
+    document.getElementById('statAbsent').textContent  = absent;
+    document.getElementById('statToday').textContent   = todayCount;
+
+    // Overall %
+    const pct = total>0 ? Math.round((present/total)*100) : 0;
+    const pctEl   = document.getElementById('pctVal');
+    const fillEl  = document.getElementById('pctFill');
+    const noteEl  = document.getElementById('pctNote');
+    pctEl.textContent = total>0 ? pct+'%' : '—%';
+    if(total===0){
+      fillEl.style.cssText='width:0%;background:var(--border)';
+      noteEl.innerHTML='<i class="fa-solid fa-circle-info"></i> No attendance records yet. Start attending classes!';
+    } else if(pct>=75){
+      pctEl.style.color='var(--success)';
+      fillEl.style.cssText=`width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--primary-light))`;
+      noteEl.innerHTML='<i class="fa-solid fa-check-circle"></i> Great! Your overall attendance is above the required 75%.';
+    } else if(pct>=60){
+      pctEl.style.color='var(--warning)';
+      fillEl.style.cssText=`width:${pct}%;background:linear-gradient(90deg,#d97706,#f59e0b)`;
+      noteEl.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> Warning! Attendance below 75%. Please attend more classes.';
+    } else {
+      pctEl.style.color='var(--danger)';
+      fillEl.style.cssText=`width:${pct}%;background:linear-gradient(90deg,var(--danger),#f87171)`;
+      noteEl.innerHTML='<i class="fa-solid fa-circle-exclamation"></i> Critical! Attendance very low. You may face academic penalties.';
+    }
+
+    renderWarnings(mine);
+    renderTodayClasses(todayRecs);
+    renderSubjectWise(mine);
+    renderHistory(mine);
+
+  }catch(err){
+    console.error(err);
+    const msg=`<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i> Could not load data<br><small>${err.message}</small></div>`;
+    ['todayList','subjectWiseList','historyList'].forEach(id=>document.getElementById(id).innerHTML=msg);
+    ['statTotal','statPresent','statAbsent','statToday'].forEach(id=>document.getElementById(id).textContent='—');
+    document.getElementById('pctVal').textContent='—%';
+    document.getElementById('pctNote').innerHTML='<i class="fa-solid fa-circle-info"></i> Could not load. Please refresh.';
+  }
+}
+
+// ── WARNING BANNERS ──
+function renderWarnings(records){
+  const section = document.getElementById('warningSection');
+  const subjects = getAllSubjects();
+  if(!subjects.length){section.innerHTML='';return;}
+  let html='';
+  subjects.forEach(sub=>{
+    const subRecs = records.filter(r=>
+      r.subject===sub.name ||
+      r.subject===sub.code ||
+      r.subjectCode===sub.code
+    );
+    if(!subRecs.length) return;
+    const present = subRecs.filter(r=>r.status==='Present').length;
+    const pct = Math.round((present/subRecs.length)*100);
+    if(pct<65){
+      html+=`<div class="warn-banner critical"><div class="warn-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="warn-text"><div class="wt">Critical: ${sub.name}</div><div class="ws">Your attendance is <b>${pct}%</b> — far below the required 75%. Immediate action needed!</div></div></div>`;
+    } else if(pct<75){
+      html+=`<div class="warn-banner warning"><div class="warn-icon"><i class="fa-solid fa-circle-exclamation"></i></div><div class="warn-text"><div class="wt">Warning: ${sub.name}</div><div class="ws">Your attendance is <b>${pct}%</b> — below the required 75%. Please attend more classes.</div></div></div>`;
+    }
+  });
+  section.innerHTML=html;
+}
+
+// ── TODAY'S CLASSES ──
+function renderTodayClasses(todayRecs){
+  const el = document.getElementById('todayList');
+  const dayIdx   = new Date().getDay();
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayFull  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const todayName = dayNames[dayIdx];
+
+  // Weekend
+  if(dayIdx === 0 || dayIdx === 6){
+    el.innerHTML=`
+      <div class="no-class-banner">
+        <div class="nc-icon"><i class="fa-solid fa-glass-cheers"></i></div>
+        <div class="nc-text">
+          <div class="nc-title">No Classes Today!</div>
+          <div class="nc-desc">Enjoy your ${dayFull[dayIdx]}. See you on Monday.</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Get today's subjects from timetable
+  const semTT = getSemTimetable();
+  if(!semTT || semTT === 'coming_soon'){
+    el.innerHTML=`<div class="empty"><i class="fa-solid fa-clock"></i> Subjects for ${student.semester} are yet to be updated.</div>`;
+    return;
+  }
+
+  const todayCodes = semTT[todayName] || [];
+  if(!todayCodes.length){
+    el.innerHTML=`<div class="empty"><i class="fa-regular fa-calendar-xmark"></i> No classes scheduled for ${dayFull[dayIdx]}.</div>`;
+    return;
+  }
+
+  // Match codes to subject objects — deduplicate
+  // Note: student-dashboard TIMETABLE stores objects {code, name}
+  const seen = new Set();
+  const todaySubjects = [];
+  todayCodes.forEach(item => {
+    // item can be object {code, name} or string code
+    const code = typeof item === 'object' ? item.code : item;
+    const name = typeof item === 'object' ? item.name : null;
+    if(seen.has(code)) return;
+    seen.add(code);
+    todaySubjects.push({code, name: name || code});
+  });
+
+  let html = '';
+  todaySubjects.forEach(sub => {
+    const rec = todayRecs.find(r =>
+      r.subject===sub.name ||
+      r.subject===sub.code ||
+      r.subjectCode===sub.code
+    );
+    let badge='', timeStr='';
+    if(rec){
+      const ok = rec.status==='Present';
+      badge=`<span class="ts-badge ${ok?'present':'absent'}"><i class="fa-solid fa-${ok?'check':'xmark'}"></i> ${ok?'Present':'Absent'}</span>`;
+      if(rec.time) timeStr=`<div class="ts-time"><i class="fa-regular fa-clock"></i> ${rec.time}</div>`;
+    } else {
+      badge=`<span class="ts-badge pending"><i class="fa-regular fa-clock"></i> Not marked</span>`;
+    }
+    html+=`<div class="today-subject"><div><div class="ts-name">${sub.name}</div><div class="ts-code">${sub.code}</div>${timeStr}</div>${badge}</div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ── SUBJECT WISE ──
+function renderSubjectWise(records){
+  const el = document.getElementById('subjectWiseList');
+  const subjects = getAllSubjects();
+  if(!subjects.length){
+    el.innerHTML=`<div class="empty"><i class="fa-solid fa-clock"></i> Subjects for ${student.semester} are yet to be updated.</div>`;
+    return;
+  }
+  let html='';
+  subjects.forEach((sub,idx)=>{
+    // Only records for THIS subject — match by name OR code
+    const subRecs = records.filter(r=>
+      r.subject===sub.name ||
+      r.subject===sub.code ||
+      r.subjectCode===sub.code
+    );
+    const total   = subRecs.length;
+    const present = subRecs.filter(r=>r.status==='Present').length;
+    const absent  = total-present;
+    const pct     = total>0 ? Math.round((present/total)*100) : 0;
+    const color   = total===0 ? 'var(--text-secondary)' : pct>=75 ? 'var(--success)' : pct>=60 ? '#f59e0b' : 'var(--danger)';
+
+    // Sort records newest first
+    const sorted=[...subRecs].sort((a,b)=>{
+      const da=new Date(a.date.split('/').reverse().join('-'));
+      const db=new Date(b.date.split('/').reverse().join('-'));
+      return db-da;
+    });
+
+    let tableRows='';
+    if(!sorted.length){
+      tableRows=`<tr><td colspan="3" style="text-align:center;color:var(--text-secondary);padding:16px;font-size:13px">No attendance records yet for this subject</td></tr>`;
+    } else {
+      sorted.forEach(r=>{
+        const ok=r.status==='Present';
+        tableRows+=`<tr><td>${r.date}</td><td>${r.time||'—'}</td><td><span class="h-badge ${ok?'present':'absent'}"><i class="fa-solid fa-${ok?'check':'xmark'}"></i> ${r.status}</span></td></tr>`;
+      });
+    }
+
+    html+=`
+    <div class="subj-stat">
+      <div class="subj-stat-head" onclick="toggleSubject(${idx})">
+        <div style="flex:1;min-width:0">
+          <div class="subj-name">${sub.name}</div>
+          <div class="subj-meta">${sub.code} · ${total} class${total!==1?'es':''} recorded</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="subj-pct" style="color:${color}">${total>0?pct+'%':'—'}</div>
+          <div class="subj-chevron" id="chev${idx}">▼</div>
+        </div>
+      </div>
+      ${total>0?`
+      <div class="subj-bar-wrap">
+        <div class="subj-bar-bg"><div class="subj-bar-fill" style="width:${pct}%;background:${color}"></div></div>
+      </div>
+      <div class="subj-counts">
+        <span class="c-present"><i class="fa-solid fa-check"></i> Present: ${present}</span>
+        <span class="c-absent"><i class="fa-solid fa-xmark"></i> Absent: ${absent}</span>
+        <span class="c-total"><i class="fa-solid fa-book"></i> Total: ${total}</span>
+      </div>`:''}
+      <div class="subj-detail" id="subDetail${idx}">
+        <table>
+          <thead><tr><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function toggleSubject(idx){
+  document.getElementById('subDetail'+idx).classList.toggle('open');
+  document.getElementById('chev'+idx).classList.toggle('open');
+}
+
+// ── RECENT HISTORY ──
+function renderHistory(records){
+  const el = document.getElementById('historyList');
+  if(!records.length){
+    el.innerHTML='<div class="empty"><i class="fa-regular fa-folder-open"></i> No attendance records yet.<br>Start attending classes!</div>';
+    return;
+  }
+  const sorted=[...records].sort((a,b)=>{
+    const da=new Date(a.date.split('/').reverse().join('-'));
+    const db=new Date(b.date.split('/').reverse().join('-'));
+    return db-da;
+  });
+  const recent=sorted.slice(0,10);
+  let html=`<table class="history-table"><thead><tr><th>Date</th><th>Subject</th><th>Time</th><th>Status</th></tr></thead><tbody>`;
+  recent.forEach(r=>{
+    const ok=r.status==='Present';
+    html+=`<tr><td>${r.date}</td><td style="font-size:12px">${r.subject}</td><td>${r.time||'—'}</td><td><span class="h-badge ${ok?'present':'absent'}"><i class="fa-solid fa-${ok?'check':'xmark'}"></i> ${r.status}</span></td></tr>`;
+  });
+  html+='</tbody></table>';
+  if(records.length>10) html+=`<div style="text-align:center;padding:12px;font-size:12px;color:var(--text-secondary);font-weight:600">Showing last 10 of ${records.length} records</div>`;
+  el.innerHTML=html;
+}
+
+function logout(){
+  localStorage.removeItem('student');
+  window.location.href='login.html';
+}
+
+// ── HAMBURGER MENU ──
+function toggleMenu(){
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const overlay = document.getElementById('mobileOverlay');
+  hamburger.classList.toggle('active');
+  mobileMenu.classList.toggle('show');
+  overlay.classList.toggle('show');
+}
+
+// Set mobile nav name
+document.getElementById('mobileNavName').textContent = student.name.split(' ')[0];
+
+// Set mobile button state based on day
+const mobileBtnAttend = document.getElementById('mobileBtnAttend');
+if(todayDayIdx === 0 || todayDayIdx === 6){
+  mobileBtnAttend.disabled = true;
+  mobileBtnAttend.innerHTML = '<i class="fa-solid fa-party-horn"></i> No Classes Today';
+  mobileBtnAttend.style.opacity = '0.6';
+  mobileBtnAttend.style.cursor = 'not-allowed';
+} else {
+  mobileBtnAttend.innerHTML = '<i class="fa-solid fa-camera"></i> Mark Attendance';
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

@@ -200,8 +200,6 @@ select option{background:#fff;color:var(--text)}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-<!-- Font Awesome CDN -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 <div class="grid-bg"></div>
@@ -231,8 +229,8 @@ select option{background:#fff;color:var(--text)}
 
     <!-- SUCCESS -->
     <div class="success-ov" id="successOv">
-      <div class="s-circle"><i class="fa-solid fa-check"></i></div>
-      <h2 class="s-title">You're in! <i class="fa-solid fa-champagne-glasses"></i></h2>
+      <div class="s-circle">✓</div>
+      <h2 class="s-title">You're in! 🎉</h2>
       <p class="s-msg">Welcome, <span class="s-name" id="sName"></span>! Your student account is ready. Sign in to view your attendance.</p>
       <button class="btn-go" onclick="location.href='login.html'">Go to Sign In →</button>
     </div>
@@ -246,84 +244,84 @@ select option{background:#fff;color:var(--text)}
       <form id="regForm" novalidate>
 
         <!-- CARD 1: Personal -->
-         <div class="f-card">
-          <div class="f-card-title">Personal Info</div>
+        <div class="f-card">
+          <div class="f-card-title">👤 Personal Info</div>
           <div class="form-grid">
 
             <div class="fg full">
               <label>Full Name</label>
-              <div class="iw"><i class="fa-regular fa-address-card ii"></i>
+              <div class="iw"><span class="ii">✏️</span>
                 <input type="text" id="fn" placeholder="Your full name" autocomplete="off">
               </div>
-              <span class="err-msg" id="fnErr"><i class="fa-solid fa-exclamation-triangle"></i> Letters only, 2–60 characters.</span>
+              <span class="err-msg" id="fnErr">⚠ Letters only, 2–60 characters.</span>
             </div>
 
             <div class="fg full">
               <label>Gender</label>
               <div class="gpills">
-                <div class="gp"><input type="radio" name="gender" id="gM" value="Male"><label for="gM"><i class="fa-solid fa-mars"></i> Male</label></div>
-                <div class="gp"><input type="radio" name="gender" id="gF" value="Female"><label for="gF"><i class="fa-solid fa-venus"></i> Female</label></div>
-                <!-- <div class="gp"><input type="radio" name="gender" id="gO" value="Other"><label for="gO">⚧ Other</label></div> -->
+                <div class="gp"><input type="radio" name="gender" id="gM" value="Male"><label for="gM">♂ Male</label></div>
+                <div class="gp"><input type="radio" name="gender" id="gF" value="Female"><label for="gF">♀ Female</label></div>
+                <div class="gp"><input type="radio" name="gender" id="gO" value="Other"><label for="gO">⚧ Other</label></div>
               </div>
-              <span class="err-msg" id="gErr"><i class="fa-solid fa-exclamation-triangle"></i> Please select gender.</span>
+              <span class="err-msg" id="gErr">⚠ Please select gender.</span>
             </div>
 
             <div class="fg">
               <label>Password</label>
-              <div class="iw"> <i class="fa-solid fa-key ii"></i>
+              <div class="iw"><span class="ii">🔒</span>
                 <input type="password" id="pwd" placeholder="Min 8 chars" oninput="strCheck(this.value)">
-                <button class="eye-btn" type="button" onclick="tog('pwd',this)"><i class="fa-regular fa-eye"></i></button>
+                <button class="eye-btn" type="button" onclick="tog('pwd',this)">👁</button>
               </div>
               <div class="str-wrap" id="strWrap"><div class="str-bar"><div class="str-fill" id="sf"></div></div><span class="str-lbl" id="sl"></span></div>
-              <span class="err-msg" id="pwdErr"><i class="fa-solid fa-exclamation-triangle"></i> Min 8 characters required.</span>
+              <span class="err-msg" id="pwdErr">⚠ Min 8 characters required.</span>
             </div>
 
             <div class="fg">
               <label>Enrollment No.</label>
-              <div class="iw"><i class="fa-solid fa-id-badge ii"></i>
-                <input type="text" id="enroll" placeholder="eg. 24230" autocomplete="off">
+              <div class="iw"><span class="ii">🪪</span>
+                <input type="text" id="enroll" placeholder="e.g. MCA2024001" autocomplete="off">
               </div>
-              <span class="err-msg" id="enrollErr"><i class="fa-solid fa-exclamation-triangle"></i> Enrollment number required.</span>
+              <span class="err-msg" id="enrollErr">⚠ Enrollment number required.</span>
             </div>
 
           </div>
         </div>
 
         <!-- CARD 2: Email Verify -->
-    <div class="f-card">
-          <div class="f-card-title">Email Verification</div>
+        <div class="f-card">
+          <div class="f-card-title">✉ Email Verification</div>
           <div class="fg">
             <label>Email Address</label>
             <div class="email-row">
-              <div class="iw"><i class="fa-regular fa-envelope ii"></i>
+              <div class="iw"><span class="ii">✉</span>
                 <input type="email" id="em" placeholder="your@email.com" autocomplete="off">
               </div>
-              <button type="button" class="btn-otp" id="btnOtp" onclick="sendOtp()">Send OTP</button>
+              <button type="button" class="btn-otp" id="btnOtp" onclick="sendOtp()">📨 Send OTP</button>
             </div>
-            <span class="err-msg" id="emErr"><i class="fa-solid fa-exclamation-triangle"></i> Enter a valid email.</span>
-            <div class="alert aw" id="dupAlert"><i class="fa-solid fa-exclamation-triangle"></i> Email already registered. <a href="login.html" style="color:var(--b2)">Sign in?</a></div>
+            <span class="err-msg" id="emErr">⚠ Enter a valid email.</span>
+            <div class="alert aw" id="dupAlert">⚠️ Email already registered. <a href="login.html" style="color:var(--b2)">Sign in?</a></div>
 
             <div class="otp-block" id="otpBlock">
               <div class="otp-hint">OTP sent to <b id="otpMail"></b></div>
               <div class="otp-row">
                 <input type="text" id="otpInp" maxlength="6" placeholder="000000">
-                <button type="button" class="btn-vf" onclick="vfOtp()">Verify <i class="fa-solid fa-check"></i></button>
+                <button type="button" class="btn-vf" onclick="vfOtp()">Verify ✓</button>
               </div>
               <div class="alert ae" id="otpErr" style="margin:0"></div>
               <div class="resend-r">Resend? <button id="resendBtn" onclick="resendOtp()" disabled>Resend (<span id="cd">60</span>s)</button></div>
             </div>
-            <div class="v-badge" id="vBadge"><div class="vc"><i class="fa-solid fa-check"></i></div> Email verified successfully!</div>
+            <div class="v-badge" id="vBadge"><div class="vc">✓</div> Email verified successfully!</div>
           </div>
         </div>
 
         <!-- CARD 3: Academic -->
         <div class="f-card">
-          <div class="f-card-title">Academic Details</div>
+          <div class="f-card-title">🏛 Academic Details</div>
           <div class="form-grid">
 
             <div class="fg">
               <label>Department</label>
-              <div class="sel-wrap iw"><i class="fa-solid fa-school ii"></i>
+              <div class="sel-wrap iw"><span class="ii">🏛</span>
                 <select id="dept">
                   <option value="" disabled selected>Select</option>
                   <option value="CSE">CSE</option>
@@ -331,41 +329,41 @@ select option{background:#fff;color:var(--text)}
                   <option value="ECE">ECE</option>
                 </select>
               </div>
-              <span class="err-msg" id="deptErr"><i class="fa-solid fa-exclamation-triangle"></i> Select a department.</span>
+              <span class="err-msg" id="deptErr">⚠ Select a department.</span>
             </div>
 
             <div class="fg">
               <label>Course</label>
-              <div class="sel-wrap iw"> <i class="fa-solid fa-graduation-cap ii"></i>
+              <div class="sel-wrap iw"><span class="ii">📚</span>
                 <select id="course">
                   <option value="" disabled selected>Select</option>
                   <option value="MCA">MCA</option>
                   <option value="M.Tech">M.Tech</option>
                 </select>
               </div>
-              <span class="err-msg" id="courseErr"><i class="fa-solid fa-exclamation-triangle"></i> Select a course.</span>
+              <span class="err-msg" id="courseErr">⚠ Select a course.</span>
             </div>
 
             <div class="fg">
               <label>Year</label>
-              <div class="sel-wrap iw"><i class="fa-solid fa-calendar-days ii"></i>
+              <div class="sel-wrap iw"><span class="ii">📆</span>
                 <select id="yr" onchange="updateSem()">
                   <option value="" disabled selected>Select</option>
                   <option value="1st">1st Year</option>
                   <option value="2nd">2nd Year</option>
                 </select>
               </div>
-              <span class="err-msg" id="yrErr"><i class="fa-solid fa-exclamation-triangle"></i> Select a year.</span>
+              <span class="err-msg" id="yrErr">⚠ Select a year.</span>
             </div>
 
             <div class="fg">
               <label>Semester</label>
-              <div class="sel-wrap iw"> <i class="fa-solid fa-list-check ii"></i>
+              <div class="sel-wrap iw"><span class="ii">📅</span>
                 <select id="sem" disabled>
                   <option value="" disabled selected>Select year first</option>
                 </select>
               </div>
-              <span class="err-msg" id="semErr"><i class="fa-solid fa-exclamation-triangle"></i> Select a semester.</span>
+              <span class="err-msg" id="semErr">⚠ Select a semester.</span>
             </div>
 
           </div>
@@ -376,16 +374,16 @@ select option{background:#fff;color:var(--text)}
 
           <!-- FACE CAPTURE CARD — hidden until form + email done -->
           <div class="f-card" id="faceCard" style="margin-bottom:16px;display:none">
-            <div class="f-card-title"><i class="fa-solid fa-camera" style="color:var(--b2)"></i> Face Registration</div>
+            <div class="f-card-title">📸 Face Registration</div>
 
             <!-- Start Camera prompt -->
             <div id="faceStart" style="text-align:center;padding:16px 0">
-              <div style="font-size:40px;margin-bottom:12px"><i class="fa-solid fa-camera" style="color:var(--b2)"></i></div>
+              <div style="font-size:40px;margin-bottom:12px">📷</div>
               <p style="font-size:14px;color:var(--sub);font-weight:600;margin-bottom:16px;line-height:1.6">
                 Almost done! We need to capture your face<br>for attendance recognition.
               </p>
               <button type="button" class="btn-face btn-face-primary" onclick="beginCamera()" style="margin:0 auto">
-                <i class="fa-solid fa-video" style="color:var(--b2)"></i> Start Camera
+                🎥 Start Camera
               </button>
             </div>
 
@@ -402,10 +400,10 @@ select option{background:#fff;color:var(--text)}
               </div>
               <div class="face-btns" style="margin-top:12px">
                 <button type="button" class="btn-face btn-face-primary" id="btnCapture" onclick="captureFace()" disabled>
-                  <i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face
+                  📸 Capture Face
                 </button>
                 <button type="button" class="btn-face btn-face-outline" onclick="retryFace()">
-                  <i class="fa-solid fa-rotate-right"></i> Retry
+                  🔄 Retry
                 </button>
               </div>
               <div style="font-size:11.5px;color:var(--sub);text-align:center;margin-top:8px;font-weight:500">
@@ -417,14 +415,14 @@ select option{background:#fff;color:var(--text)}
             <!-- Captured preview -->
             <div class="face-captured" id="faceCaptured">
               <img id="facePreview" class="face-preview" src="" alt="Face">
-              <div class="face-ok-badge"><i class="fa-solid fa-check-circle"></i> Face captured successfully!</div>
+              <div class="face-ok-badge">✅ Face captured successfully!</div>
               <button type="button" class="btn-face btn-face-outline" onclick="retryFace()" style="margin-top:4px">
-                <i class="fa-solid fa-rotate-right"></i> Retake Photo
+                🔄 Retake Photo
               </button>
             </div>
           </div>
 
-          <button type="submit" class="btn-main" id="subBtn" disabled><i class="fa-solid fa-lock"></i> Verify Email to Register</button>
+          <button type="submit" class="btn-main" id="subBtn" disabled>🔒 Verify Email to Register</button>
           <div class="login-row">Already registered? <a href="login.html">Sign in here</a></div>
         </div>
 
@@ -447,19 +445,12 @@ window.addEventListener('load', async()=>{
 });
 
 async function loadModels(){
-  console.log('Loading AI models from:', FACE_API_URL);
-  try {
-    await Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri(FACE_API_URL),
-      faceapi.nets.faceLandmark68TinyNet.loadFromUri(FACE_API_URL),
-      faceapi.nets.faceRecognitionNet.loadFromUri(FACE_API_URL)
-    ]);
-    modelsLoaded=true;
-    console.log('AI models loaded successfully!');
-  } catch(e) {
-    console.error('Model loading failed:', e);
-    throw e;
-  }
+  await Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri(FACE_API_URL),
+    faceapi.nets.faceLandmark68TinyNet.loadFromUri(FACE_API_URL),
+    faceapi.nets.faceRecognitionNet.loadFromUri(FACE_API_URL)
+  ]);
+  modelsLoaded=true;
 }
 
 // Called when student clicks "Start Camera" button
@@ -467,18 +458,9 @@ async function beginCamera(){
   document.getElementById('faceStart').style.display='none';
   document.getElementById('faceSetup').style.display='block';
   setFaceStatus('yellow','Starting camera...');
-
-  // Check if face-api.js loaded
-  if(typeof faceapi === 'undefined'){
-    setFaceStatus('red','face-api.js not loaded. Check internet connection.');
-    return;
-  }
-
   if(!modelsLoaded){
     setFaceStatus('yellow','Loading AI models, please wait...');
-    try{
-      await loadModels();
-    } catch(e){
+    try{ await loadModels(); }catch(e){
       setFaceStatus('red','Failed to load models: '+e.message);
       return;
     }
@@ -488,19 +470,6 @@ async function beginCamera(){
 
 async function startFaceCamera(){
   try{
-    // Check if mediaDevices is supported
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error('Camera API not supported in this browser');
-    }
-
-    // Check for available devices
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const videoDevices = devices.filter(d => d.kind === 'videoinput');
-
-    if (videoDevices.length === 0) {
-      throw new Error('No camera found. Please connect a webcam.');
-    }
-
     faceStream=await navigator.mediaDevices.getUserMedia({video:true});
     const video=document.getElementById('faceVideo');
     video.srcObject=faceStream;
@@ -520,21 +489,15 @@ function startFaceDetectionLoop(){
   const canvas=document.getElementById('faceCanvas');
   setInterval(async()=>{
     if(!modelsLoaded||faceCaptured) return;
-    if(video.readyState !== 4) return; // Wait for video to be ready
-
-    try {
-      const det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.3}));
-      canvas.width=video.videoWidth; canvas.height=video.videoHeight;
-      const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
-      if(det){
-        setFaceStatus('green','Face detected ✓ — click Capture Face');
-        const dims=faceapi.matchDimensions(canvas,video,true);
-        faceapi.draw.drawDetections(canvas,faceapi.resizeResults(det,dims));
-      } else {
-        setFaceStatus('yellow','No face detected — look at the camera');
-      }
-    } catch(e) {
-      console.log('Detection error:', e);
+    const det=await faceapi.detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.5}));
+    canvas.width=video.videoWidth; canvas.height=video.videoHeight;
+    const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+    if(det){
+      setFaceStatus('green','Face detected ✓ — click Capture Face');
+      const dims=faceapi.matchDimensions(canvas,video,true);
+      faceapi.draw.drawDetections(canvas,faceapi.resizeResults(det,dims));
+    } else {
+      setFaceStatus('yellow','No face detected — look at the camera');
     }
   },800);
 }
@@ -542,56 +505,22 @@ function startFaceDetectionLoop(){
 async function captureFace(){
   const video=document.getElementById('faceVideo');
   const btn=document.getElementById('btnCapture');
-  btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
+  btn.disabled=true; btn.textContent='⏳ Processing...';
 
-  // Check if models are loaded first
-  if(!modelsLoaded){
-    showFaceErr('AI models not loaded. Reload page and try again.');
-    btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face';
+  const det=await faceapi
+    .detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.5}))
+    .withFaceLandmarks(true)
+    .withFaceDescriptor();
+
+  if(!det){
+    showFaceErr('❌ No face detected. Ensure good lighting and look directly at camera.');
+    btn.disabled=false; btn.innerHTML='📸 Capture Face';
     return;
   }
 
-  // Wait for video to be ready
-  if(video.readyState !== 4){
-    await new Promise(r => setTimeout(r, 500));
-  }
-
-  let det = null;
-
-  try {
-    // Add timeout to prevent hanging
-    const detectionPromise = faceapi
-      .detectSingleFace(video,new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.3}))
-      .withFaceLandmarks(true)
-      .withFaceDescriptor();
-
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Detection timed out')), 10000)
-    );
-
-    det = await Promise.race([detectionPromise, timeoutPromise]);
-
-    if(!det){
-      showFaceErr('No face detected. Ensure good lighting and look directly at camera.');
-      btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face';
-      return;
-    }
-
-  } catch(e) {
-    showFaceErr('Error: ' + e.message);
-    btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face';
-    return;
-  }
-
-  // Save descriptor (only runs if det was found)
-  if(det && det.descriptor){
-    faceDescriptor=Array.from(det.descriptor);
-    faceCaptured=true;
-  } else {
-    showFaceErr('Could not capture face. Try again.');
-    btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face';
-    return;
-  }
+  // Save descriptor
+  faceDescriptor=Array.from(det.descriptor);
+  faceCaptured=true;
 
   // Create preview snapshot
   const snap=document.createElement('canvas');
@@ -615,7 +544,7 @@ function retryFace(){
   document.getElementById('faceCaptured').classList.remove('show');
   document.getElementById('faceSetup').style.display='block';
   document.getElementById('btnCapture').disabled=false;
-  document.getElementById('btnCapture').innerHTML='<i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face';
+  document.getElementById('btnCapture').innerHTML='📸 Capture Face';
   hideFaceErr();
   startFaceCamera();
   updateSubmitBtn();
@@ -637,10 +566,10 @@ function updateSubmitBtn(){
     btn.textContent='Complete Registration →';
   } else if(verified && !faceCaptured){
     btn.disabled=true;
-    btn.innerHTML='<i class="fa-solid fa-camera" style="color:var(--b2)"></i> Capture Face to Continue';
+    btn.textContent='📸 Capture Face to Continue';
   } else {
     btn.disabled=true;
-    btn.innerHTML='<i class="fa-solid fa-lock"></i> Verify Email to Register';
+    btn.textContent='🔒 Verify Email to Register';
   }
 }
 
@@ -683,18 +612,18 @@ async function sendOtp(){
   ha('dupAlert');document.getElementById('emErr').style.display='none';emEl.classList.remove('err');
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){document.getElementById('emErr').style.display='block';emEl.classList.add('err');return;}
 
-  const btn=document.getElementById('btnOtp');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
+  const btn=document.getElementById('btnOtp');btn.disabled=true;btn.textContent='⏳ Checking...';
   try{const r=await fetch(SHEET_URL+'?action=checkEmail&email='+encodeURIComponent(email));const j=await r.json();
-    if(j.exists){sa('dupAlert');emEl.classList.add('err');btn.disabled=false;btn.innerHTML='<i class="fa-regular fa-paper-plane"></i> Send OTP';return;}
+    if(j.exists){sa('dupAlert');emEl.classList.add('err');btn.disabled=false;btn.innerHTML='📨 Send OTP';return;}
   }catch{}
 
-  otp=Math.floor(100000+Math.random()*900000).toString();tries=0;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+  otp=Math.floor(100000+Math.random()*900000).toString();tries=0;btn.textContent='⏳ Sending...';
   try{await fetch(SHEET_URL+'?action=sendOtp&email='+encodeURIComponent(email)+'&otp='+otp,{method:'GET',mode:'no-cors'});}catch{}
 
   document.getElementById('otpMail').textContent=email;
   document.getElementById('otpBlock').classList.add('show');
   document.getElementById('otpInp').value='';ha('otpErr');
-  btn.innerHTML='<i class="fa-regular fa-paper-plane"></i> Resend';btn.disabled=false;
+  btn.innerHTML='✉ Resend';btn.disabled=false;
   setProg(2);startCd();
 }
 
@@ -706,12 +635,9 @@ function startCd(){
 function resendOtp(){otp=Math.floor(100000+Math.random()*900000).toString();tries=0;const e=document.getElementById('em').value.trim();fetch(SHEET_URL+'?action=sendOtp&email='+encodeURIComponent(e)+'&otp='+otp,{method:'GET',mode:'no-cors'});document.getElementById('otpInp').value='';ha('otpErr');startCd();}
 
 function vfOtp(){
-  ha('otpErr');
-  const v=document.getElementById('otpInp').value.trim();
-  const storedOtp = otp ? otp.trim() : '';
-  console.log('Input:', v, 'Stored:', storedOtp); // Debug log
-  if(tries>=5){sa('otpErr','Too many attempts. Request a new OTP.');return;}
-  if(v === storedOtp && storedOtp !== ''){
+  ha('otpErr');const v=document.getElementById('otpInp').value.trim();
+  if(tries>=5){sa('otpErr','⚠️ Too many attempts. Request a new OTP.');return;}
+  if(v===otp){
     verified=true;verifiedEmail=document.getElementById('em').value.trim();
     document.getElementById('otpBlock').classList.remove('show');
     document.getElementById('vBadge').classList.add('show');
@@ -721,7 +647,7 @@ function vfOtp(){
     // ── Show face card now that email is verified ──
     document.getElementById('faceCard').style.display='block';
     updateSubmitBtn();
-  }else{tries++;sa('otpErr','Wrong OTP. '+(5-tries)+' attempt(s) left.');}
+  }else{tries++;sa('otpErr','⚠️ Wrong OTP. '+(5-tries)+' attempt(s) left.');}
 }
 document.getElementById('otpInp').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();vfOtp();}});
 
@@ -742,9 +668,9 @@ function validate(){
   const enroll=document.getElementById('enroll');
   if(!enroll.value.trim()){se(enroll,'enrollErr',true);v=false;}else se(enroll,'enrollErr',false);
 
-  if(!verified){const em=document.getElementById('em');em.classList.add('err');document.getElementById('emErr').innerHTML='<i class="fa-solid fa-exclamation-triangle"></i> Please verify your email first.';document.getElementById('emErr').style.display='block';v=false;}
+  if(!verified){const em=document.getElementById('em');em.classList.add('err');document.getElementById('emErr').textContent='⚠ Please verify your email first.';document.getElementById('emErr').style.display='block';v=false;}
 
-  if(!faceCaptured){showFaceErr('<i class="fa-solid fa-exclamation-triangle"></i> Please capture your face before submitting.');v=false;}
+  if(!faceCaptured){showFaceErr('⚠ Please capture your face before submitting.');v=false;}
 
   ['dept','course','yr','sem'].forEach(id=>{
     const el=document.getElementById(id);
@@ -759,7 +685,7 @@ document.getElementById('regForm').addEventListener('submit',async e=>{
   e.preventDefault();
   if(!validate()){document.querySelector('.form-inner').classList.remove('shake');void document.querySelector('.form-inner').offsetWidth;document.querySelector('.form-inner').classList.add('shake');return;}
 
-  const btn=document.getElementById('subBtn');btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Registering...';btn.disabled=true;
+  const btn=document.getElementById('subBtn');btn.textContent='⏳ Registering...';btn.disabled=true;
   const payload={
     name:document.getElementById('fn').value.trim(),
     gender:document.querySelector('input[name="gender"]:checked').value,
@@ -778,7 +704,7 @@ document.getElementById('regForm').addEventListener('submit',async e=>{
     document.getElementById('allForms').style.display='none';
     document.getElementById('successOv').classList.add('show');
     setProg(4);
-  }catch{btn.innerHTML='<i class="fa-solid fa-xmark"></i> Failed — Try Again';btn.style.background='linear-gradient(120deg,#c0392b,#e74c3c)';btn.disabled=false;}
+  }catch{btn.textContent='✕ Failed — Try Again';btn.style.background='linear-gradient(120deg,#c0392b,#e74c3c)';btn.disabled=false;}
 });
 
 // clear errors live
