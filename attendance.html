@@ -35,7 +35,27 @@ nav{position:relative;z-index:10;background:var(--glass);backdrop-filter:blur(12
 .nav-user b{color:var(--text)}
 .btn-logout{padding:8px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
 .btn-logout:hover{border-color:var(--danger);color:var(--danger);background:#fef2f2}
-@media(max-width:600px){nav{padding:0 16px}.nav-user{display:none}}
+
+/* HAMBURGER */
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:20}
+.hamburger span{display:block;width:24px;height:2.5px;background:var(--text);border-radius:2px;transition:all .3s}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+/* MOBILE MENU */
+.mobile-menu{display:none;position:absolute;top:68px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:var(--shadow-lg);flex-direction:column;z-index:15}
+.mobile-menu.show{display:flex}
+.mobile-menu-item{padding:14px 20px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.mobile-menu-item:hover{background:var(--bg);color:var(--primary)}
+@media(max-width:600px){
+  nav{padding:0 16px}
+  .nav-user{display:none}
+  .nav-right{display:none}
+  .hamburger{display:flex}
+  .dept-text{display:none}
+  .nav-name{font-size:14px}
+}
 
 /* MAIN */
 .main{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:36px 24px 60px}
@@ -171,14 +191,23 @@ canvas#overlay{position:absolute;inset:0;width:100%;height:100%;transform:scaleX
 <nav>
   <div class="nav-brand">
     <div class="nav-logo"><img src="logo.png" alt="TU Logo"></div>
-    <div class="nav-name">D<span>OIT</span><span style="font-size:10px;color:var(--text-secondary);font-weight:600;display:block;font-family:'Plus Jakarta Sans',sans-serif;margin-top:2px">Dept. of Information Technology</span></div>
+    <div class="nav-name">D<span>OIT</span><span class="dept-text" style="font-size:10px;color:var(--text-secondary);font-weight:600;display:block;font-family:'Plus Jakarta Sans',sans-serif;margin-top:2px">Dept. of Information Technology</span></div>
   </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
   <div class="nav-right">
     <button class="btn-cam btn-secondary" onclick="window.location.href='student-dashboard.html'" style="padding:8px 16px;font-size:12px">
       <i class="fa-solid fa-house-chimney"></i> Dashboard
     </button>
     <div class="nav-user">Welcome, <b id="navName">Student</b></div>
     <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="student-dashboard.html" class="mobile-menu-item"><i class="fa-solid fa-house-chimney"></i> Dashboard</a>
+    <a href="login.html" class="mobile-menu-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
   </div>
 </nav>
 
@@ -1276,6 +1305,21 @@ function logout() {
   localStorage.removeItem('student');
   window.location.href = 'login.html';
 }
+
+// ── HAMBURGER MENU ──
+document.getElementById('hamburger').addEventListener('click', function(){
+  this.classList.toggle('active');
+  document.getElementById('mobileMenu').classList.toggle('show');
+});
+// Close menu when clicking outside
+document.addEventListener('click', function(e){
+  const hamburger = document.getElementById('hamburger');
+  const menu = document.getElementById('mobileMenu');
+  if(!hamburger.contains(e.target) && !menu.contains(e.target)){
+    hamburger.classList.remove('active');
+    menu.classList.remove('show');
+  }
+});
 </script>
 </body>
 </html>
