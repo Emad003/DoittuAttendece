@@ -580,7 +580,7 @@ function renderWarnings(records){
     const present = subRecs.filter(r=>r.status==='Present').length;
     const pct = Math.round((present/subRecs.length)*100);
     if(pct<65){
-      html+=`<div class="warn-banner critical"><div class="warn-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="warn-text"><div class="wt">Critical: ${sub.name}</div><div class="ws">Your attendance is <b>${pct}%</b> — far below the required 75%. Immediate action needed!</div></div></div>`;
+      html+=`<div class="warn-banner critical"><div class="warn-icon"><i class="fa-solid fa-triangle-exclamation"></i></div><div class="warn-text"><div class="wt">Critical: ${sub.name}</div><div class="ws">Your attendance is <b>${pct}%</b>, far below the required 75%. Immediate action needed!</div></div></div>`;
     } else if(pct<75){
       html+=`<div class="warn-banner warning"><div class="warn-icon"><i class="fa-solid fa-circle-exclamation"></i></div><div class="warn-text"><div class="wt">Warning: ${sub.name}</div><div class="ws">Your attendance is <b>${pct}%</b> — below the required 75%. Please attend more classes.</div></div></div>`;
     }

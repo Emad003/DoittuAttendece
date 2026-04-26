@@ -133,6 +133,21 @@ select option{background:#fff;color:var(--text)}
 .v-badge.show{display:flex;animation:fadeIn .3s ease}
 .v-badge .vc{width:17px;height:17px;border-radius:50%;background:var(--ok);color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
 
+/* enrollment check */
+.enroll-check{display:none;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-top:6px}
+.enroll-check.show{display:flex;animation:fadeIn .3s ease}
+.enroll-check.ok{color:var(--ok)}
+.enroll-check.err{color:var(--err)}
+.enroll-check .ec{width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.enroll-check.ok .ec{background:var(--ok);color:#fff}
+.enroll-check.err .ec{background:var(--err);color:#fff}
+.enroll-check .spinner{width:14px;height:14px;border:2px solid rgba(0,0,0,0.1);border-top-color:currentColor;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* check animation */
+input.checking{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(15,79,168,0.1)}50%{box-shadow:0 0 0 6px rgba(15,79,168,0.2)}}
+
 /* alerts */
 .alert{display:none;padding:10px 13px;border-radius:10px;font-size:13px;font-weight:600;margin-top:6px;align-items:center;gap:8px;line-height:1.4}
 .alert.show{display:flex;animation:fadeIn .3s ease}
@@ -281,9 +296,10 @@ select option{background:#fff;color:var(--text)}
             <div class="fg">
               <label>Enrollment No.</label>
               <div class="iw"><i class="fa-solid fa-id-badge ii"></i>
-                <input type="text" id="enroll" placeholder="eg. 24230" autocomplete="off">
+                <input type="text" id="enroll" placeholder="9-digits " autocomplete="off" maxlength="9">
               </div>
               <span class="err-msg" id="enrollErr"><i class="fa-solid fa-exclamation-triangle"></i> Enrollment number required.</span>
+              <div class="enroll-check" id="enrollCheck"></div>
             </div>
 
           </div>
@@ -326,9 +342,9 @@ select option{background:#fff;color:var(--text)}
               <div class="sel-wrap iw"><i class="fa-solid fa-school ii"></i>
                 <select id="dept">
                   <option value="" disabled selected>Select</option>
-                  <option value="CSE">CSE</option>
                   <option value="IT">IT</option>
-                  <option value="ECE">ECE</option>
+                  <option value="CSE" disabled>CSE</option>
+                  <option value="ECE" disabled>ECE</option>
                 </select>
               </div>
               <span class="err-msg" id="deptErr"><i class="fa-solid fa-exclamation-triangle"></i> Select a department.</span>
@@ -740,7 +756,14 @@ function validate(){
   if(pwd.value.length<8){se(pwd,'pwdErr',true);v=false;}else se(pwd,'pwdErr',false);
 
   const enroll=document.getElementById('enroll');
-  if(!enroll.value.trim()){se(enroll,'enrollErr',true);v=false;}else se(enroll,'enrollErr',false);
+  const enrollVal=enroll.value.trim();
+  if(!enrollVal || enrollVal.length!==9 || !/^\d+$/.test(enrollVal)){
+    se(enroll,'enrollErr',true);v=false;
+  }else if(enrollExists){
+    document.getElementById('enrollErr').innerHTML='<i class="fa-solid fa-exclamation-triangle"></i> This enrollment is already registered. <a href="login.html" style="color:var(--b2)">Sign in?</a>';
+    document.getElementById('enrollErr').style.display='block';
+    enroll.classList.add('err');v=false;
+  }else se(enroll,'enrollErr',false);
 
   if(!verified){const em=document.getElementById('em');em.classList.add('err');document.getElementById('emErr').innerHTML='<i class="fa-solid fa-exclamation-triangle"></i> Please verify your email first.';document.getElementById('emErr').style.display='block';v=false;}
 
@@ -779,6 +802,113 @@ document.getElementById('regForm').addEventListener('submit',async e=>{
     document.getElementById('successOv').classList.add('show');
     setProg(4);
   }catch{btn.innerHTML='<i class="fa-solid fa-xmark"></i> Failed — Try Again';btn.style.background='linear-gradient(120deg,#c0392b,#e74c3c)';btn.disabled=false;}
+});
+
+// ── ENROLLMENT CHECK with 5-second debounce ──
+let enrollCheckTimer = null;
+let enrollChecking = false;
+let enrollExists = false; // Track if enrollment is already registered
+
+function showEnrollCheck(msg, type) {
+  const ec = document.getElementById('enrollCheck');
+  if (type === 'loading') {
+    ec.innerHTML = '<div class="spinner"></div> ' + msg;
+    ec.className = 'enroll-check show';
+  } else if (type === 'ok') {
+    ec.innerHTML = '<div class="ec"><i class="fa-solid fa-check"></i></div> ' + msg;
+    ec.className = 'enroll-check show ok';
+  } else if (type === 'err') {
+    ec.innerHTML = '<div class="ec"><i class="fa-solid fa-xmark"></i></div> ' + msg;
+    ec.className = 'enroll-check show err';
+  } else {
+    ec.className = 'enroll-check';
+  }
+}
+
+async function checkEnrollmentExists(enrollVal) {
+  const enrollInput = document.getElementById('enroll');
+  enrollInput.classList.add('checking');
+  showEnrollCheck('Checking availability...', 'loading');
+
+  try {
+    const r = await fetch(SHEET_URL + '?action=checkEnrollment&enrollment=' + encodeURIComponent(enrollVal));
+    const j = await r.json();
+
+    enrollInput.classList.remove('checking');
+
+    if (j.exists) {
+      enrollExists = true; // Block registration
+      showEnrollCheck('Enrollment already registered!', 'err');
+      enrollInput.classList.add('err');
+      // Don't show main enrollErr - show message in enrollCheck div only
+      document.getElementById('enrollErr').style.display = 'none';
+    } else {
+      enrollExists = false; // Allow registration
+      showEnrollCheck('Enrollment available!', 'ok');
+      enrollInput.classList.remove('err');
+      enrollInput.classList.add('ok-inp');
+      document.getElementById('enrollErr').style.display = 'none';
+    }
+  } catch (e) {
+    enrollInput.classList.remove('checking');
+    showEnrollCheck('Could not verify. Try again.', 'err');
+  }
+}
+
+document.getElementById('enroll').addEventListener('input', function() {
+  const val = this.value.trim();
+
+  // Clear previous timer
+  if (enrollCheckTimer) clearTimeout(enrollCheckTimer);
+
+  // Clear check status if empty
+  if (!val) {
+    showEnrollCheck('', '');
+    this.classList.remove('err', 'ok-inp', 'checking');
+    document.getElementById('enrollErr').style.display = 'none';
+    return;
+  }
+
+  // If less than 9 digits - show alert
+  if (val.length < 9) {
+    showEnrollCheck('', '');
+    this.classList.remove('ok-inp', 'checking');
+    // document.getElementById('enrollErr').innerHTML = '';
+    document.getElementById('enrollErr').style.display = 'block';
+    this.classList.add('err');
+    return;
+  }
+
+  // If more than 9 digits - show error
+  if (val.length > 9 || !/^\d+$/.test(val)) {
+    showEnrollCheck('', '');
+    this.classList.remove('ok-inp', 'checking');
+    document.getElementById('enrollErr').innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Must be exactly 9 digits.';
+    document.getElementById('enrollErr').style.display = 'block';
+    this.classList.add('err');
+    return;
+  }
+
+  // Exactly 9 digits - CHECK INSTANTLY (no delay!)
+  this.classList.remove('err');
+  document.getElementById('enrollErr').style.display = 'none';
+  showEnrollCheck('', '');
+  enrollExists = false; // Reset flag when checking new value
+
+  checkEnrollmentExists(val);
+});
+
+// ── BLUR CHECK: Alert when clicking away with < 9 digits ──
+document.getElementById('enroll').addEventListener('blur', function() {
+  const val = this.value.trim();
+
+  // Only show alert if less than 9 digits
+  if (val && val.length < 9) {
+    document.getElementById('enrollErr').innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> Must be 9 Digits.';
+    document.getElementById('enrollErr').style.display = 'block';
+    this.classList.add('err');
+    showEnrollCheck('', '');
+  }
 });
 
 // clear errors live

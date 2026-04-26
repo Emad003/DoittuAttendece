@@ -1,1254 +1,2268 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOIT — Mark Attendance</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --primary:#0f4fa8;--primary-light:#1a6fd4;--primary-lighter:#3d8ef0;--primary-pale:#c8dffe;
-  --bg:#f5f7fb;--white:#fff;--text:#1a1f36;--text-secondary:#5a6a8a;
-  --border:#e2e8f0;--danger:#dc2626;--success:#059669;--warning:#d97706;
-  --glass:rgba(255,255,255,0.85);--shadow-sm:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.06);
-  --shadow-md:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -1px rgba(0,0,0,0.04);
-  --shadow-lg:0 10px 15px -3px rgba(0,0,0,0.06),0 4px 6px -2px rgba(0,0,0,0.04);
-  --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;
-}
-body{min-height:100vh;background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);overflow-x:hidden;line-height:1.5}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DOIT — Mark Attendance</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"
+    ></script>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0; 
+      }
+      :root {
+        --primary: #0f4fa8;
+        --primary-light: #1a6fd4;
+        --primary-lighter: #3d8ef0;
+        --primary-pale: #c8dffe;
+        --bg: #f5f7fb;
+        --white: #fff;
+        --text: #1a1f36;
+        --text-secondary: #5a6a8a;
+        --border: #e2e8f0;
+        --danger: #dc2626;
+        --success: #059669;
+        --warning: #d97706;
+        --glass: rgba(255, 255, 255, 0.85);
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04),
+          0 1px 2px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+          0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.06),
+          0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 20px;
+      }
+      body {
+        min-height: 100vh;
+        background: var(--bg);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        color: var(--text);
+        overflow-x: hidden;
+        line-height: 1.5;
+      }
 
-/* BG */
-.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle at 20% 50%,rgba(15,79,168,0.04) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(15,79,168,0.03) 0%,transparent 40%)}
+      /* BG */
+      .grid-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image: radial-gradient(
+            circle at 20% 50%,
+            rgba(15, 79, 168, 0.04) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 80%,
+            rgba(15, 79, 168, 0.03) 0%,
+            transparent 40%
+          );
+      }
 
-/* NAV */
-nav{position:relative;z-index:10;background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:68px}
-.nav-brand{display:flex;align-items:center;gap:12px}
-.nav-logo{height:44px;width:auto;border-radius:var(--radius-sm);background:var(--white);display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;flex-shrink:0;box-shadow:var(--shadow-sm)}
-.nav-logo img{height:38px;width:auto;object-fit:contain}
-.nav-name{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
-.nav-name span{color:var(--primary)}
-.nav-right{display:flex;align-items:center;gap:12px}
-.nav-user{font-size:13px;font-weight:600;color:var(--text-secondary)}
-.nav-user b{color:var(--text)}
-.btn-logout{padding:8px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .2s}
-.btn-logout:hover{border-color:var(--danger);color:var(--danger);background:#fef2f2}
+      /* NAV */
+      nav {
+        position: relative;
+        z-index: 10;
+        background: var(--glass);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 68px;
+      }
+      .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .nav-logo {
+        height: 44px;
+        width: auto;
+        border-radius: var(--radius-sm);
+        background: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 4px;
+        flex-shrink: 0;
+        box-shadow: var(--shadow-sm);
+      }
+      .nav-logo img {
+        height: 38px;
+        width: auto;
+        object-fit: contain;
+      }
+      .nav-name {
+        font-family: "Syne", sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--text);
+        letter-spacing: -0.5px;
+      }
+      .nav-name span {
+        color: var(--primary);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .nav-user {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      .nav-user b {
+        color: var(--text);
+      }
+      .btn-logout {
+        padding: 8px 16px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-logout:hover {
+        border-color: var(--danger);
+        color: var(--danger);
+        background: #fef2f2;
+      }
 
-/* HAMBURGER */
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px;z-index:20}
-.hamburger span{display:block;width:24px;height:2.5px;background:var(--text);border-radius:2px;transition:all .3s}
-.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
-.hamburger.active span:nth-child(2){opacity:0}
-.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+      /* HAMBURGER */
+      .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        margin-right: 8px;
+      }
+      .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text);
+        margin: 5px 0;
+        border-radius: 2px;
+        transition: all 0.3s;
+      }
+      .hamburger.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -5px);
+      }
 
-/* MOBILE MENU */
-.mobile-menu{display:none;position:absolute;top:68px;left:0;right:0;background:var(--white);border-bottom:1px solid var(--border);box-shadow:var(--shadow-lg);flex-direction:column;z-index:15}
-.mobile-menu.show{display:flex}
-.mobile-menu-item{padding:14px 20px;font-size:14px;font-weight:600;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
-.mobile-menu-item:hover{background:var(--bg);color:var(--primary)}
-@media(max-width:600px){
-  nav{padding:0 16px}
-  .nav-user{display:none}
-  .nav-right{display:none}
-  .hamburger{display:flex}
-  .dept-text{display:none}
-  .nav-name{font-size:14px}
-}
+      /* MOBILE MENU */
+      .mobile-menu {
+        position: fixed;
+        top: 72px;
+        left: 10px;
+        right: 10px;
+        max-width: 400px;
+        margin: 0 auto;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        z-index: 200;
+        display: none;
+        flex-direction: column;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+      }
+      .mobile-menu.show {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .mobile-menu button {
+        width: 100%;
+        text-align: left;
+        padding: 16px 22px;
+        border: none;
+        border-radius: var(--radius-lg);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.25s;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .mobile-menu .btn-dash {
+        background: linear-gradient(135deg, #0f4fa8, #2563eb);
+        color: var(--white);
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(15, 79, 168, 0.4);
+      }
+      .mobile-menu .btn-dash:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(15, 79, 168, 0.5);
+      }
+      .mobile-menu .btn-logout {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #dc2626;
+        border: 1px solid #fecaca;
+      }
+      .mobile-menu .btn-logout:hover {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+        border-color: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+      }
 
-/* MAIN */
-.main{position:relative;z-index:1;max-width:1020px;margin:0 auto;padding:36px 24px 60px}
+      @media (max-width: 768px) {
+        nav {
+          padding: 0 16px;
+          height: 64px;
+        }
+        .hamburger {
+          display: block;
+        }
+        .nav-right {
+          display: none;
+        }
+        .nav-user {
+          display: none;
+        }
+        .mobile-menu {
+          top: 64px;
+        }
+        .nav-brand {
+          margin-right: auto;
+        }
+        .dept-text {
+          display: none;
+        }
+      }
 
-/* PAGE HEADER */
-.page-hdr{margin-bottom:28px}
-.page-hdr h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--primary);margin-bottom:6px;letter-spacing:-0.5px}
-.page-hdr p{font-size:14px;color:var(--text-secondary);font-weight:500}
-.date-chip{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:50px;padding:6px 14px;font-size:12px;font-weight:600;color:var(--primary);margin-top:12px}
-.date-chip i{font-size:11px}
+      /* MAIN */
+      .main {
+        position: relative;
+        z-index: 1;
+        max-width: 1020px;
+        margin: 0 auto;
+        padding: 36px 24px 60px;
+      }
 
-/* SUBJECT SELECTOR */
-.subject-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px 28px;margin-bottom:24px;box-shadow:var(--shadow-md)}
-.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:18px;display:flex;align-items:center;gap:10px}
-.card-title i{color:var(--primary);font-size:15px}
-.card-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
-.subject-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-.subj-btn{padding:14px 18px;background:var(--bg);border:2px solid transparent;border-radius:var(--radius-md);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .25s;text-align:left}
-.subj-btn:hover{border-color:var(--primary-pale);color:var(--primary);background:var(--white);box-shadow:var(--shadow-sm)}
-.subj-btn.selected{border-color:var(--primary);background:linear-gradient(135deg,var(--primary),var(--primary-light));color:var(--white);box-shadow:0 4px 14px rgba(15,79,168,0.3)}
-.subj-btn:disabled.subj-btn.selected{opacity:1;cursor:not-allowed}
-.subj-code{font-size:10px;font-weight:700;opacity:.8;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.8px}
-.subj-btn.selected .subj-code{opacity:.9}
+      /* PAGE HEADER */
+      .page-hdr {
+        margin-bottom: 28px;
+      }
+      .page-hdr h1 {
+        font-family: "Syne", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 6px;
+        letter-spacing: -0.5px;
+      }
+      .page-hdr p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+      .date-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--primary);
+        margin-top: 12px;
+      }
+      .date-chip i {
+        font-size: 11px;
+      }
 
-/* CAMERA CARD */
-.camera-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px 28px;margin-bottom:24px;box-shadow:var(--shadow-md)}
+      /* SUBJECT SELECTOR */
+      .subject-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 26px 28px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-md);
+      }
+      .card-title {
+        font-family: "Syne", sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-title i {
+        color: var(--primary);
+        font-size: 15px;
+      }
+      .card-title::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--border), transparent);
+      }
+      .subject-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .subj-btn {
+        padding: 14px 18px;
+        background: var(--bg);
+        border: 2px solid transparent;
+        border-radius: var(--radius-md);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.25s;
+        text-align: left;
+      }
+      .subj-btn:hover {
+        border-color: var(--primary-pale);
+        color: var(--primary);
+        background: var(--white);
+        box-shadow: var(--shadow-sm);
+      }
+      .subj-btn.selected {
+        border-color: var(--primary);
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        color: var(--white);
+        box-shadow: 0 4px 14px rgba(15, 79, 168, 0.3);
+      }
+      .subj-btn.glow-enabled {
+        border: 2px solid #3b82f6;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.35),
+          0 0 40px rgba(59, 130, 246, 0.15);
+        animation: glow-pulse-blue 2s ease-in-out infinite;
+      }
+      @keyframes glow-pulse-blue {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(59, 130, 246, 0.35),
+            0 0 40px rgba(59, 130, 246, 0.15);
+        }
+        50% {
+          box-shadow: 0 0 25px rgba(59, 130, 246, 0.5),
+            0 0 50px rgba(59, 130, 246, 0.25);
+        }
+      }
+      .subj-btn:disabled.subj-btn.selected {
+        opacity: 1;
+        cursor: not-allowed;
+      }
+      .subj-code {
+        font-size: 10px;
+        font-weight: 700;
+        opacity: 0.8;
+        display: block;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+      .subj-btn.selected .subj-code {
+        opacity: 0.9;
+      }
 
-.cam-wrap{position:relative;width:100%;max-width:500px;margin:0 auto;border-radius:var(--radius-lg);overflow:hidden;background:#0d1b3e;aspect-ratio:4/3;box-shadow:var(--shadow-lg)}
-video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}
-canvas#overlay{position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1)}
+      /* CAMERA CARD */
+      .camera-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 26px 28px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-md);
+      }
 
-/* scanning ring */
-.scan-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.ring{width:200px;height:200px;border-radius:50%;border:3px solid rgba(26,111,212,.5);position:relative;animation:pulse-ring 2s ease-in-out infinite}
-.ring::before{content:'';position:absolute;inset:10px;border-radius:50%;border:2px dashed rgba(26,111,212,.3);animation:spin 8s linear infinite}
-@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.05);opacity:1}}
-@keyframes spin{to{transform:rotate(360deg)}}
+      .cam-wrap {
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        background: #0d1b3e;
+        aspect-ratio: 4/3;
+        box-shadow: var(--shadow-lg);
+      }
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transform: scaleX(-1);
+      }
+      canvas#overlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transform: scaleX(-1);
+      }
 
-/* corner brackets */
-.brackets{position:absolute;inset:24px;pointer-events:none}
-.brackets::before,.brackets::after,.brackets span::before,.brackets span::after{content:'';position:absolute;width:28px;height:28px;border-color:var(--primary-lighter);border-style:solid}
-.brackets::before{top:0;left:0;border-width:3px 0 0 3px;border-radius:6px 0 0 0}
-.brackets::after{top:0;right:0;border-width:3px 3px 0 0;border-radius:0 6px 0 0}
-.brackets span::before{bottom:0;left:0;border-width:0 0 3px 3px;border-radius:0 0 0 6px}
-.brackets span::after{bottom:0;right:0;border-width:0 3px 3px 0;border-radius:0 0 6px 0}
+      /* scanning ring */
+      .scan-ring {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .ring {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        border: 3px solid rgba(26, 111, 212, 0.5);
+        position: relative;
+        animation: pulse-ring 2s ease-in-out infinite;
+      }
+      .ring::before {
+        content: "";
+        position: absolute;
+        inset: 10px;
+        border-radius: 50%;
+        border: 2px dashed rgba(26, 111, 212, 0.3);
+        animation: spin 8s linear infinite;
+      }
+      @keyframes pulse-ring {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 1;
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
 
-/* cam status bar */
-.cam-status{position:absolute;bottom:0;left:0;right:0;padding:12px 18px;background:linear-gradient(transparent,rgba(13,27,62,.9));display:flex;align-items:center;gap:10px}
-.status-dot{width:8px;height:8px;border-radius:50%;background:var(--success);flex-shrink:0;animation:blink 1.2s ease infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.status-dot.red{background:var(--danger);animation:none}
-.status-dot.yellow{background:var(--warning)}
-.status-text{font-size:13px;font-weight:600;color:rgba(255,255,255,.95)}
+      /* corner brackets */
+      .brackets {
+        position: absolute;
+        inset: 24px;
+        pointer-events: none;
+      }
+      .brackets::before,
+      .brackets::after,
+      .brackets span::before,
+      .brackets span::after {
+        content: "";
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-color: var(--primary-lighter);
+        border-style: solid;
+      }
+      .brackets::before {
+        top: 0;
+        left: 0;
+        border-width: 3px 0 0 3px;
+        border-radius: 6px 0 0 0;
+      }
+      .brackets::after {
+        top: 0;
+        right: 0;
+        border-width: 3px 3px 0 0;
+        border-radius: 0 6px 0 0;
+      }
+      .brackets span::before {
+        bottom: 0;
+        left: 0;
+        border-width: 0 0 3px 3px;
+        border-radius: 0 0 0 6px;
+      }
+      .brackets span::after {
+        bottom: 0;
+        right: 0;
+        border-width: 0 3px 3px 0;
+        border-radius: 0 0 6px 0;
+      }
 
-/* cam controls */
-.cam-controls{display:flex;gap:12px;margin-top:18px;justify-content:center;flex-wrap:wrap}
-.btn-cam{padding:12px 26px;border:none;border-radius:var(--radius-md);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;gap:8px}
-.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:var(--white);box-shadow:0 4px 14px rgba(15,79,168,0.3)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,79,168,0.4)}
-.btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
-.btn-secondary{background:var(--white);border:1px solid var(--border);color:var(--text-secondary)}
-.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+      /* cam status bar */
+      .cam-status {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 12px 18px;
+        background: linear-gradient(transparent, rgba(13, 27, 62, 0.9));
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        flex-shrink: 0;
+        animation: blink 1.2s ease infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .status-dot.red {
+        background: var(--danger);
+        animation: none;
+      }
+      .status-dot.yellow {
+        background: var(--warning);
+      }
+      .status-text {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+      }
 
-/* RESULT PANEL */
-.result-panel{display:none;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px 28px;box-shadow:var(--shadow-md)}
-.result-panel.show{display:block;animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+      /* cam controls */
+      .cam-controls {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .btn-cam {
+        padding: 12px 26px;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-light)
+        );
+        color: var(--white);
+        box-shadow: 0 4px 14px rgba(15, 79, 168, 0.3);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(15, 79, 168, 0.4);
+      }
+      .btn-primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .btn-secondary {
+        background: var(--white);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+      }
+      .btn-secondary:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
 
-/* result cards */
-.result-box{display:flex;align-items:center;gap:16px;padding:20px 22px;border-radius:var(--radius-lg);margin-bottom:14px}
-.result-box.success{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #a7f3d0}
-.result-box.error{background:linear-gradient(135deg,#fef2f2,#fee2e2);border:1px solid #fecaca}
-.result-box.warning{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a}
-.result-icon{width:52px;height:52px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.result-box.success .result-icon{background:var(--success);color:var(--white)}
-.result-box.error .result-icon{background:var(--danger);color:var(--white)}
-.result-box.warning .result-icon{background:var(--warning);color:var(--white)}
-.result-text h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;margin-bottom:4px}
-.result-box.success .result-text h3{color:#15803d}
-.result-box.error .result-text h3{color:var(--danger)}
-.result-box.warning .result-text h3{color:#92400e}
-.result-text p{font-size:14px;font-weight:500;color:var(--text-secondary)}
+      /* RESULT PANEL */
+      .result-panel {
+        display: none;
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        padding: 26px 28px;
+        box-shadow: var(--shadow-md);
+      }
+      .result-panel.show {
+        display: block;
+        animation: fadeUp 0.4s ease;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
 
-/* attendance info grid */
-.att-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
-.att-chip{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px}
-.att-chip .lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary);margin-bottom:4px}
-.att-chip .val{font-size:15px;font-weight:700;color:var(--text)}
+      /* result cards */
+      .result-box {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 22px;
+        border-radius: var(--radius-lg);
+        margin-bottom: 14px;
+      }
+      .result-box.success {
+        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        border: 1px solid #a7f3d0;
+      }
+      .result-box.error {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        border: 1px solid #fecaca;
+      }
+      .result-box.warning {
+        background: linear-gradient(135deg, #fffbeb, #fef3c7);
+        border: 1px solid #fde68a;
+      }
+      .result-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+      .result-box.success .result-icon {
+        background: var(--success);
+        color: var(--white);
+      }
+      .result-box.error .result-icon {
+        background: var(--danger);
+        color: var(--white);
+      }
+      .result-box.warning .result-icon {
+        background: var(--warning);
+        color: var(--white);
+      }
+      .result-text h3 {
+        font-family: "Syne", sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .result-box.success .result-text h3 {
+        color: #15803d;
+      }
+      .result-box.error .result-text h3 {
+        color: var(--danger);
+      }
+      .result-box.warning .result-text h3 {
+        color: #92400e;
+      }
+      .result-text p {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
 
-/* FONT AWESOME ICON STYLES */
-.fa-solid, .fa-regular { color: inherit; }
-.btn-primary .fa-solid, .btn-primary .fa-regular { color: var(--white); }
-.nav-logo .fa-solid { font-size:18px; color:#fff; }
-.btn-cam .fa-solid, .btn-cam .fa-regular { margin-right:6px; }
-.subj-code + .fa-solid { margin-right:4px; }
-.card-title .fa-solid, .card-title .fa-regular { color:var(--primary); margin-right:6px; }
-.cam-status .fa-solid { margin-right:6px; }
+      /* attendance info grid */
+      .att-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .att-chip {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
+      }
+      .att-chip .lbl {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+      }
+      .att-chip .val {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+      }
 
-/* LOADING OVERLAY */
-.loading-ov{display:none;position:fixed;inset:0;background:rgba(13,27,62,.7);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:18px;backdrop-filter:blur(6px)}
-.loading-ov.show{display:flex}
-.spinner{width:56px;height:56px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--white);border-radius:50%;animation:spin 0.8s linear infinite}
-.loading-txt{font-size:15px;font-weight:600;color:var(--white);letter-spacing:.5px}
+      /* FONT AWESOME ICON STYLES */
+      .fa-solid,
+      .fa-regular {
+        color: inherit;
+      }
+      .btn-primary .fa-solid,
+      .btn-primary .fa-regular {
+        color: var(--white);
+      }
+      .nav-logo .fa-solid {
+        font-size: 18px;
+        color: #fff;
+      }
+      .btn-cam .fa-solid,
+      .btn-cam .fa-regular {
+        margin-right: 6px;
+      }
+      .subj-code + .fa-solid {
+        margin-right: 4px;
+      }
+      .card-title .fa-solid,
+      .card-title .fa-regular {
+        color: var(--primary);
+        margin-right: 6px;
+      }
+      .cam-status .fa-solid {
+        margin-right: 6px;
+      }
 
-/* STATS BAR */
-.stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
-.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;box-shadow:var(--shadow-md);text-align:center;transition:transform .2s}
-.stat-card:hover{transform:translateY(-2px)}
-.stat-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--primary);line-height:1}
-.stat-lbl{font-size:11px;font-weight:700;color:var(--text-secondary);margin-top:6px;text-transform:uppercase;letter-spacing:.8px}
-.stat-card:nth-child(2) .stat-num{color:var(--success)}
-.stat-card:nth-child(3) .stat-num{color:var(--primary-light)}
-@media(max-width:500px){.stats-bar{grid-template-columns:1fr 1fr}.stat-card:last-child{grid-column:1/-1}}
+      /* LOADING OVERLAY */
+      .loading-ov {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(13, 27, 62, 0.7);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 18px;
+        backdrop-filter: blur(6px);
+      }
+      .loading-ov.show {
+        display: flex;
+      }
+      .spinner {
+        width: 56px;
+        height: 56px;
+        border: 4px solid rgba(255, 255, 255, 0.2);
+        border-top-color: var(--white);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      .loading-txt {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--white);
+        letter-spacing: 0.5px;
+      }
 
-/* alert */
-.alert{padding:12px 16px;border-radius:var(--radius-md);font-size:13px;font-weight:600;display:none;align-items:center;gap:10px;margin-bottom:16px}
-.alert.show{display:flex;animation:fadeUp .3s ease}
-.alert-warn{background:linear-gradient(135deg,#fffbeb,#fff);border:1px solid #fed7aa;color:#92400e}
-.alert-info{background:linear-gradient(135deg,#eff6ff,#fff);border:1px solid #bfdbfe;color:var(--primary)}
-.alert i{font-size:14px}
-</style>
-</head>
-<body>
-<div class="grid-bg"></div>
+      /* STATS BAR */
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 24px;
+      }
+      .stat-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 20px 22px;
+        box-shadow: var(--shadow-md);
+        text-align: center;
+        transition: transform 0.2s;
+      }
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
+      .stat-num {
+        font-family: "Syne", sans-serif;
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--primary);
+        line-height: 1;
+      }
+      .stat-lbl {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-secondary);
+        margin-top: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+      .stat-card:nth-child(2) .stat-num {
+        color: var(--success);
+      }
+      .stat-card:nth-child(3) .stat-num {
+        color: var(--primary-light);
+      }
+      @media (max-width: 500px) {
+        .stats-bar {
+          grid-template-columns: 1fr 1fr;
+        }
+        .stat-card:last-child {
+          grid-column: 1/-1;
+        }
+      }
 
-<!-- LOADING OVERLAY -->
-<div class="loading-ov" id="loadingOv">
-  <div class="spinner"></div>
-  <div class="loading-txt" id="loadingTxt">Loading AI models...</div>
-</div>
+      /* alert */
+      .alert {
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+        font-weight: 600;
+        display: none;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .alert.show {
+        display: flex;
+        animation: fadeUp 0.3s ease;
+      }
+      .alert-warn {
+        background: linear-gradient(135deg, #fffbeb, #fff);
+        border: 1px solid #fed7aa;
+        color: #92400e;
+      }
+      .alert-info {
+        background: linear-gradient(135deg, #eff6ff, #fff);
+        border: 1px solid #bfdbfe;
+        color: var(--primary);
+      }
+      .alert i {
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-bg"></div>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-brand">
-    <div class="nav-logo"><img src="logo.png" alt="TU Logo"></div>
-    <div class="nav-name">D<span>OIT</span><span class="dept-text" style="font-size:10px;color:var(--text-secondary);font-weight:600;display:block;font-family:'Plus Jakarta Sans',sans-serif;margin-top:2px">Dept. of Information Technology</span></div>
-  </div>
-  <button class="hamburger" id="hamburger" aria-label="Menu">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-  <div class="nav-right">
-    <button class="btn-cam btn-secondary" onclick="window.location.href='student-dashboard.html'" style="padding:8px 16px;font-size:12px">
-      <i class="fa-solid fa-house-chimney"></i> Dashboard
-    </button>
-    <div class="nav-user">Welcome, <b id="navName">Student</b></div>
-    <button class="btn-logout" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
-  </div>
-  <div class="mobile-menu" id="mobileMenu">
-    <a href="student-dashboard.html" class="mobile-menu-item"><i class="fa-solid fa-house-chimney"></i> Dashboard</a>
-    <a href="login.html" class="mobile-menu-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
-  </div>
-</nav>
-
-<!-- MAIN -->
-<div class="main">
-
-  <div class="page-hdr">
-    <h1>Mark Attendance</h1>
-    <p>Select your subject, then scan your face to mark attendance</p>
-    <div class="date-chip"><i class="fa-regular fa-calendar"></i> <span id="dateDisplay"></span></div>
-  </div>
-
-  <!-- STATS -->
-  <div class="stats-bar">
-    <div class="stat-card">
-      <div class="stat-num" id="statTotal">—</div>
-      <div class="stat-lbl">Classes Today</div>
+    <!-- LOADING OVERLAY -->
+    <div class="loading-ov" id="loadingOv">
+      <div class="spinner"></div>
+      <div class="loading-txt" id="loadingTxt">Loading AI models...</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statPresent" style="color:var(--ok)">—</div>
-      <div class="stat-lbl">Marked Today</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num" id="statPercent" style="color:var(--b2)">—%</div>
-      <div class="stat-lbl">Overall Attendance</div>
-    </div>
-  </div>
 
-  <!-- ALERT -->
-  <div class="alert alert-warn" id="mainAlert"></div>
-  <div class="alert alert-info" id="infoAlert"></div>
-
-  <!-- SUBJECT SELECTOR -->
-  <div class="subject-card">
-    <div class="card-title"><i class="fa-solid fa-book-open"></i> Select Subject</div>
-    <div class="subject-grid" id="subjectGrid">
-      <!-- Populated by JS based on student's course/semester -->
-    </div>
-  </div>
-
-  <!-- CAMERA -->
-  <div class="camera-card">
-    <div class="card-title"><i class="fa-solid fa-camera-retro"></i> Face Scan</div>
-
-    <!-- Start Camera Prompt — shown by default -->
-    <div id="cameraStart" style="text-align:center;padding:32px 20px">
-      <div style="font-size:48px;margin-bottom:14px"><i class="fa-solid fa-camera" style="font-size:48px;color:var(--primary)"></i></div>
-      <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--primary);margin-bottom:8px">Ready to Scan?</div>
-      <p style="font-size:13px;color:var(--sub);font-weight:500;margin-bottom:20px;line-height:1.6">
-        Select a subject above, then click<br>Start Camera to scan your face.
-      </p>
-      <button class="btn-cam btn-primary" onclick="beginAttendanceCamera()" id="btnStartCam" style="margin:0 auto">
-        <i class="fa-solid fa-video"></i> Start Camera
+    <!-- NAV -->
+    <nav>
+      <div class="nav-brand">
+        <div class="nav-logo"><img src="logo.png" alt="TU Logo" /></div>
+        <div class="nav-name">
+          D<span>OIT</span
+          ><span
+            class="dept-text"
+            style="
+              font-size: 10px;
+              color: var(--text-secondary);
+              font-weight: 600;
+              display: block;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              margin-top: 2px;
+            "
+            >Dept. of Information Technology</span
+          >
+        </div>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
-    </div>
+      <div class="nav-right">
+        <button
+          class="btn-cam btn-secondary"
+          onclick="window.location.href='student-dashboard.html'"
+          style="padding: 8px 16px; font-size: 12px"
+        >
+          <i class="fa-solid fa-house-chimney"></i> Dashboard
+        </button>
+        <div class="nav-user">Welcome, <b id="navName">Student</b></div>
+        <button class="btn-logout" onclick="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+      <div class="mobile-menu" id="mobileMenu">
+        <button
+          class="btn-dash"
+          onclick="location.href='student-dashboard.html'"
+        >
+          <i class="fa-solid fa-house-chimney"></i> Dashboard
+        </button>
+        <button class="btn-logout" onclick="logout()">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </nav>
 
-    <!-- Camera View — hidden until Start Camera clicked -->
-    <div id="cameraView" style="display:none">
-      <div class="cam-wrap" id="camWrap">
-        <video id="video" autoplay muted playsinline></video>
-        <canvas id="overlay"></canvas>
-        <div class="scan-ring" id="scanRing">
-          <div class="ring"></div>
-        </div>
-        <div class="brackets"><span></span></div>
-        <div class="cam-status">
-          <div class="status-dot yellow" id="statusDot"></div>
-          <div class="status-text" id="statusText">Starting camera...</div>
+    <!-- MAIN -->
+    <div class="main">
+      <div class="page-hdr">
+        <h1>Mark Attendance</h1>
+        <p>Select your subject, then scan your face to mark attendance</p>
+        <div class="date-chip">
+          <i class="fa-regular fa-calendar"></i> <span id="dateDisplay"></span>
         </div>
       </div>
 
-      <div class="cam-controls">
-        <button class="btn-cam btn-primary" id="btnScan" onclick="scanFace()" disabled>
-          <i class="fa-solid fa-camera"></i> Scan My Face
-        </button>
-        <button class="btn-cam btn-secondary" onclick="resetScan()">
-          <i class="fa-solid fa-rotate"></i> Reset
-        </button>
+      <!-- STATS -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-lbl">Classes Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statPresent" style="color: var(--ok)">
+            —
+          </div>
+          <div class="stat-lbl">Marked Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statPercent" style="color: var(--b2)">
+            —%
+          </div>
+          <div class="stat-lbl">Overall Attendance</div>
+        </div>
       </div>
+
+      <!-- ALERT -->
+      <div class="alert alert-warn" id="mainAlert"></div>
+      <div class="alert alert-info" id="infoAlert"></div>
+
+      <!-- SUBJECT SELECTOR -->
+      <div class="subject-card">
+        <div class="card-title">
+          <i class="fa-solid fa-book-open"></i> Select Subject
+        </div>
+        <div class="subject-grid" id="subjectGrid">
+          <!-- Populated by JS based on student's course/semester -->
+        </div>
+      </div>
+
+      <!-- CAMERA -->
+      <div class="camera-card">
+        <div class="card-title">
+          <i class="fa-solid fa-camera-retro"></i> Face Scan
+        </div>
+
+        <!-- Start Camera Prompt — shown by default -->
+        <div id="cameraStart" style="text-align: center; padding: 32px 20px">
+          <div style="font-size: 48px; margin-bottom: 14px">
+            <i
+              class="fa-solid fa-camera"
+              style="font-size: 48px; color: var(--primary)"
+            ></i>
+          </div>
+          <div
+            style="
+              font-family: 'Syne', sans-serif;
+              font-size: 17px;
+              font-weight: 800;
+              color: var(--primary);
+              margin-bottom: 8px;
+            "
+          >
+            Ready to Scan?
+          </div>
+          <p
+            style="
+              font-size: 13px;
+              color: var(--sub);
+              font-weight: 500;
+              margin-bottom: 20px;
+              line-height: 1.6;
+            "
+          >
+            Select a subject above, then click<br />Start Camera to scan your
+            face.
+          </p>
+          <button
+            class="btn-cam btn-primary"
+            onclick="beginAttendanceCamera()"
+            id="btnStartCam"
+            style="margin: 0 auto"
+          >
+            <i class="fa-solid fa-video"></i> Start Camera
+          </button>
+        </div>
+
+        <!-- Camera View — hidden until Start Camera clicked -->
+        <div id="cameraView" style="display: none">
+          <div class="cam-wrap" id="camWrap">
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="overlay"></canvas>
+            <div class="scan-ring" id="scanRing">
+              <div class="ring"></div>
+            </div>
+            <div class="brackets"><span></span></div>
+            <div class="cam-status">
+              <div class="status-dot yellow" id="statusDot"></div>
+              <div class="status-text" id="statusText">Starting camera...</div>
+            </div>
+          </div>
+
+          <div class="cam-controls">
+            <button
+              class="btn-cam btn-primary"
+              id="btnScan"
+              onclick="scanFace()"
+              disabled
+            >
+              <i class="fa-solid fa-camera"></i> Scan My Face
+            </button>
+            <button class="btn-cam btn-secondary" onclick="resetScan()">
+              <i class="fa-solid fa-rotate"></i> Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-panel" id="resultPanel"></div>
     </div>
-  </div>
 
-  <!-- RESULT -->
-  <div class="result-panel" id="resultPanel"></div>
+    <script>
+      // ── CONFIG ──
+      const SHEET_URL =
+        "https://script.google.com/macros/s/AKfycbxq77REqZDT2ZZUk-bA0S9jjI7BSjnt_cZ3cBxutOrGubRd0lkBY1ArDpiWf8PCGe_m/exec";
+      const FACE_API_URL = "./weights";
 
-</div>
+      // ── CHECK IF ATTENDANCE IS ENABLED BY FACULTY ──
+      let attendanceControlState = {};
 
-<script>
-// ── CONFIG ──
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxq77REqZDT2ZZUk-bA0S9jjI7BSjnt_cZ3cBxutOrGubRd0lkBY1ArDpiWf8PCGe_m/exec';
-const FACE_API_URL = './weights';
+      async function loadAttendanceControlFromSheet(date) {
+        console.log("Loading attendance control for date:", date);
+        try {
+          const r = await fetch(
+            `${SHEET_URL}?action=getAttendanceControl&date=${encodeURIComponent(
+              date
+            )}`
+          );
+          const j = await r.json();
+          console.log("Attendance control response:", j);
 
-// ── CHECK IF ATTENDANCE IS ENABLED BY FACULTY ──
-let attendanceControlState = {};
+          if (j.controls && j.controls.length > 0) {
+            j.controls.forEach((c) => {
+              // Store both with and without case sensitivity
+              const key = `${c.subjectCode.toUpperCase()}_${date}`;
+              attendanceControlState[key] =
+                c.enabled === true || c.enabled === "true";
+              console.log(
+                "Setting control state:",
+                key,
+                "=",
+                attendanceControlState[key]
+              );
+            });
+          }
+        } catch (e) {
+          console.log("Could not load attendance control from sheet", e);
+        }
+      }
 
-async function loadAttendanceControlFromSheet(date) {
-  console.log('Loading attendance control for date:', date);
-  try {
-    const r = await fetch(`${SHEET_URL}?action=getAttendanceControl&date=${encodeURIComponent(date)}`);
-    const j = await r.json();
-    console.log('Attendance control response:', j);
+      function isAttendanceEnabled(subjectCode, date) {
+        // Case insensitive matching
+        const key = `${subjectCode.toUpperCase()}_${date}`;
+        const enabled = attendanceControlState[key] === true;
+        console.log(
+          "Checking isAttendanceEnabled:",
+          subjectCode,
+          date,
+          "=",
+          enabled,
+          "key:",
+          key
+        );
+        return enabled;
+      }
 
-    if (j.controls && j.controls.length > 0) {
-      j.controls.forEach(c => {
-        // Store both with and without case sensitivity
-        const key = `${c.subjectCode.toUpperCase()}_${date}`;
-        attendanceControlState[key] = c.enabled === true || c.enabled === 'true';
-        console.log('Setting control state:', key, '=', attendanceControlState[key]);
+      // ── CONSISTENT DATE FORMAT ──
+      function formatDate(date) {
+        const d = date || new Date();
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+
+      function normalizeDate(dateStr) {
+        if (!dateStr) return "";
+        // If ISO datetime: "2026-03-22T18:30:00.000Z"
+        // Use LOCAL date parts to avoid UTC timezone shift (IST = UTC+5:30)
+        if (dateStr.includes("T")) {
+          const d = new Date(dateStr);
+          if (!isNaN(d.getTime())) {
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0");
+            const year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+          }
+        }
+        // ISO date without time: "2026-03-22"
+        if (dateStr.includes("-") && !dateStr.includes("/")) {
+          const parts = dateStr.split("-");
+          if (parts.length === 3) {
+            return `${parts[2].padStart(2, "0")}/${parts[1].padStart(2, "0")}/${
+              parts[0]
+            }`;
+          }
+        }
+        // Already dd/mm/yyyy — ensure leading zeros
+        const parts = dateStr.split("/");
+        if (parts.length === 3) {
+          return `${parts[0].padStart(2, "0")}/${parts[1].padStart(2, "0")}/${
+            parts[2]
+          }`;
+        }
+        return dateStr;
+      }
+
+      // ── SUBJECTS per course ──
+      const SUBJECTS = {
+        MCA: {
+          "1st": [
+            {
+              code: "MCA0101C",
+              name: "Mathematical Foundations of Computer Applications",
+            },
+            { code: "MCA0102C", name: "Programming in C" },
+            {
+              code: "MCA0103C",
+              name: "Computer Organization & Assembly Language Programming",
+            },
+            { code: "CSK-III", name: "Computer Skill-III" },
+            { code: "MCA0104C", name: "Programming Laboratory" },
+            { code: "MCA0105C", name: "Assembly Language Laboratory" },
+          ],
+          "2nd": [
+            { code: "MCA0201C", name: "Data Structures" },
+            { code: "MCA0202C", name: "Object Oriented Programming" },
+            { code: "MCA0203C", name: "Operating Systems" },
+            { code: "MCA0204C", name: "Discrete Mathematics" },
+            { code: "MCA0205C", name: "Data Structures Laboratory" },
+            { code: "MCA0206C", name: "OOP Laboratory" },
+          ],
+          "3rd": [
+            { code: "MCA0301C", name: "Database Management Systems" },
+            { code: "MCA0302C", name: "Data Communication & Computer Network" },
+            { code: "MCA0010E", name: "Elective I" },
+            { code: "MCA0015E", name: "Elective II" },
+            {
+              code: "MCA0303C",
+              name: "Database Management Systems Laboratory",
+            },
+            { code: "MCA0304C", name: "Computer Network Laboratory" },
+            { code: "MCA0305C", name: "Project Phase I" },
+          ],
+          "4th": [
+            { code: "MCA0401C", name: "Software Engineering" },
+            { code: "MCA0402C", name: "Cloud Computing" },
+            { code: "MCA0403C", name: "Elective III" },
+            { code: "MCA0404C", name: "Elective IV" },
+            { code: "MCA0405C", name: "Project Phase II" },
+          ],
+        },
+        "M.Tech": {
+          "1st": [
+            { code: "MT101", name: "Advanced Algorithms" },
+            { code: "MT102", name: "Research Methodology" },
+            { code: "MT103", name: "Advanced Networks" },
+            { code: "MT104", name: "Embedded Systems" },
+            { code: "MT105", name: "Digital Signal Processing" },
+          ],
+          "2nd": [
+            { code: "MT201", name: "Machine Learning" },
+            { code: "MT202", name: "VLSI Design" },
+            { code: "MT203", name: "Advanced DBMS" },
+            { code: "MT204", name: "Wireless Networks" },
+            { code: "MT205", name: "Seminar" },
+          ],
+          "3rd": [
+            { code: "MT301", name: "Dissertation Phase I" },
+            { code: "MT302", name: "Elective I" },
+            { code: "MT303", name: "Elective II" },
+          ],
+          "4th": [{ code: "MT401", name: "Dissertation Phase II" }],
+        },
+      };
+
+      // ── TIMETABLE — Day wise subject codes ──
+      const TIMETABLE = {
+        MCA: {
+          "1st Semester": {
+            Mon: ["MCA0103C", "MCA0102C"],
+            Tue: ["CSK-III", "MCA0105C"],
+            Wed: ["MCA0101C", "MCA0103C", "MCA0104C"],
+            Thu: ["CSK-III", "MCA0101C", "MCA0104C"],
+            Fri: ["MCA0102C", "MCA0105C"],
+            Sat: [],
+            Sun: [],
+          },
+          "2nd Semester": {
+            Mon: ["MCA0201C", "MCA0202C"],
+            Tue: ["MCA0203C", "MCA0204C"],
+            Wed: ["MCA0201C", "MCA0205C"],
+            Thu: ["MCA0202C", "MCA0206C"],
+            Fri: ["MCA0203C", "MCA0204C"],
+            Sat: [],
+            Sun: [],
+          },
+          "3rd Semester": {
+            Mon: ["MCA0305C", "MCA0303C", "MCA0010E", "MCA0015E"],
+            Tue: ["MCA0301C", "MCA0010E", "MCA0015E", "MCA0305C"],
+            Wed: ["MCA0305C", "MCA0302C", "MCA0304C", "MCA0010E"],
+            Thu: ["MCA0305C", "MCA0302C", "MCA0304C"],
+            Fri: ["MCA0303C", "MCA0015E", "MCA0301C", "MCA0305C"],
+            Sat: [],
+            Sun: [],
+          },
+          "4th Semester": {
+            Mon: ["MCA0401C", "MCA0402C"],
+            Tue: ["MCA0403C", "MCA0405C"],
+            Wed: ["MCA0401C", "MCA0404C"],
+            Thu: ["MCA0402C", "MCA0405C"],
+            Fri: ["MCA0403C", "MCA0404C"],
+            Sat: [],
+            Sun: [],
+          },
+        },
+        "M.Tech": {
+          "1st Semester": {
+            Mon: ["MT101", "MT102"],
+            Tue: ["MT103", "MT104"],
+            Wed: ["MT101", "MT105"],
+            Thu: ["MT102", "MT104"],
+            Fri: ["MT103", "MT105"],
+            Sat: [],
+            Sun: [],
+          },
+          "2nd Semester": {
+            Mon: ["MT201", "MT202"],
+            Tue: ["MT203", "MT204"],
+            Wed: ["MT201", "MT205"],
+            Thu: ["MT202", "MT203"],
+            Fri: ["MT204", "MT205"],
+            Sat: [],
+            Sun: [],
+          },
+          "3rd Semester": {
+            Mon: ["MT301", "MT302"],
+            Tue: ["MT301", "MT303"],
+            Wed: ["MT301", "MT302"],
+            Thu: ["MT301", "MT303"],
+            Fri: ["MT301"],
+            Sat: [],
+            Sun: [],
+          },
+          "4th Semester": {
+            Mon: ["MT401"],
+            Tue: ["MT401"],
+            Wed: ["MT401"],
+            Thu: ["MT401"],
+            Fri: ["MT401"],
+            Sat: [],
+            Sun: [],
+          },
+        },
+      };
+
+      // Day index to short name
+      const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      // Semester to year mapping
+      const SEM_TO_YEAR = {
+        "1st Semester": "1st",
+        "2nd Semester": "1st",
+        "3rd Semester": "2nd",
+        "4th Semester": "2nd",
+      };
+
+      // ── STATE ──
+      let student = null;
+      let selectedSubject = null;
+      let modelsLoaded = false;
+      let stream = null;
+      let studentDescriptor = null;
+      let allDescriptors = [];
+      let scanInProgress = false;
+      // Track subjects already marked today (client-side — resets on refresh)
+      const markedToday = new Set();
+      const markedStatus = {}; // Track status: { 'MCA0102C': 'Present' or 'Absent' }
+
+      // ── INIT ──
+      window.addEventListener("DOMContentLoaded", async () => {
+        // Set date
+        document.getElementById("dateDisplay").textContent =
+          new Date().toLocaleDateString("en-IN", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+
+        // Get student from localStorage
+        const stored = localStorage.getItem("student");
+        if (!stored) {
+          window.location.href = "login.html";
+          return;
+        }
+        student = JSON.parse(stored);
+        document.getElementById("navName").textContent =
+          student.name.split(" ")[0];
+
+        // Render subjects based on today's day
+        renderSubjects();
+
+        // Load models + fetch already-marked subjects in parallel
+        try {
+          // Show loading state on subject buttons
+          showAlert(
+            "infoAlert",
+            '<i class="fa-solid fa-spinner fa-spin"></i> Checking your attendance records...',
+            "alert-info"
+          );
+
+          const today = formatDate(new Date());
+          const [, , ,] = await Promise.all([
+            loadModels().then(() => {
+              modelsLoaded = true;
+            }),
+            loadAllDescriptors(),
+            loadAlreadyMarkedToday(), // fetch marked subjects → re-renders buttons
+            loadAttendanceControlFromSheet(today), // fetch attendance control state from sheet
+          ]);
+
+          hideAlert("infoAlert");
+        } catch (err) {
+          hideAlert("infoAlert");
+        }
+
+        loadMyStats();
+
+        // ── AUTO REFRESH attendance control every 10 seconds ──
+        setInterval(async () => {
+          const today = formatDate(new Date());
+          await loadAttendanceControlFromSheet(today);
+          renderSubjects();
+        }, 10000);
+
+        // Re-check marked subjects when student returns to page (tab focus)
+        document.addEventListener("visibilitychange", async () => {
+          if (document.visibilityState === "visible") {
+            const today = formatDate(new Date());
+            await loadAlreadyMarkedToday();
+            await loadAttendanceControlFromSheet(today);
+            renderSubjects(); // Re-render to show updated enabled/disabled state
+          }
+        });
       });
-    }
-  } catch(e) {
-    console.log('Could not load attendance control from sheet', e);
-  }
-}
 
-function isAttendanceEnabled(subjectCode, date) {
-  // Case insensitive matching
-  const key = `${subjectCode.toUpperCase()}_${date}`;
-  const enabled = attendanceControlState[key] === true;
-  console.log('Checking isAttendanceEnabled:', subjectCode, date, '=', enabled, 'key:', key);
-  return enabled;
-}
+      async function beginAttendanceCamera() {
+        if (!selectedSubject) {
+          showAlert(
+            "mainAlert",
+            '<i class="fa-solid fa-triangle-exclamation"></i> Please select a subject first before starting camera!',
+            "alert-warn"
+          );
+          return;
+        }
 
-// ── CONSISTENT DATE FORMAT ──
-function formatDate(date){
-  const d = date || new Date();
-  const day   = String(d.getDate()).padStart(2,'0');
-  const month = String(d.getMonth()+1).padStart(2,'0');
-  const year  = d.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+        // ── Check if attendance is enabled by faculty ──
+        const today = formatDate(new Date());
+        if (!isAttendanceEnabled(selectedSubject.code, today)) {
+          showAlert(
+            "mainAlert",
+            '<i class="fa-solid fa-lock"></i> Attendance is currently <b>disabled</b> for this subject. Please contact your faculty to enable it.',
+            "alert-warn"
+          );
+          return;
+        }
 
-function normalizeDate(dateStr){
-  if(!dateStr) return '';
-  // If ISO datetime: "2026-03-22T18:30:00.000Z"
-  // Use LOCAL date parts to avoid UTC timezone shift (IST = UTC+5:30)
-  if(dateStr.includes('T')){
-    const d = new Date(dateStr);
-    if(!isNaN(d.getTime())){
-      const day   = String(d.getDate()).padStart(2,'0');
-      const month = String(d.getMonth()+1).padStart(2,'0');
-      const year  = d.getFullYear();
-      return `${day}/${month}/${year}`;
-    }
-  }
-  // ISO date without time: "2026-03-22"
-  if(dateStr.includes('-') && !dateStr.includes('/')){
-    const parts = dateStr.split('-');
-    if(parts.length === 3){
-      return `${parts[2].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[0]}`;
-    }
-  }
-  // Already dd/mm/yyyy — ensure leading zeros
-  const parts = dateStr.split('/');
-  if(parts.length === 3){
-    return `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2]}`;
-  }
-  return dateStr;
-}
+        // ── Check if this subject is already marked today ──
+        if (
+          markedToday.has(selectedSubject.code) ||
+          markedToday.has(selectedSubject.name)
+        ) {
+          showAlert(
+            "mainAlert",
+            `You already marked attendance for <b>${selectedSubject.name}</b> today!`,
+            "alert-warn"
+          );
+          // Reset selection
+          document
+            .querySelectorAll(".subj-btn")
+            .forEach((b) => b.classList.remove("selected"));
+          selectedSubject = null;
+          return;
+        }
 
-// ── SUBJECTS per course ──
-const SUBJECTS = {
-  'MCA': {
-    '1st': [
-      {code:'MCA0101C', name:'Mathematical Foundations of Computer Applications'},
-      {code:'MCA0102C', name:'Programming in C'},
-      {code:'MCA0103C', name:'Computer Organization & Assembly Language Programming'},
-      {code:'CSK-III',  name:'Computer Skill-III'},
-      {code:'MCA0104C', name:'Programming Laboratory'},
-      {code:'MCA0105C', name:'Assembly Language Laboratory'},
-    ],
-    '2nd': [
-      {code:'MCA0201C', name:'Data Structures'},
-      {code:'MCA0202C', name:'Object Oriented Programming'},
-      {code:'MCA0203C', name:'Operating Systems'},
-      {code:'MCA0204C', name:'Discrete Mathematics'},
-      {code:'MCA0205C', name:'Data Structures Laboratory'},
-      {code:'MCA0206C', name:'OOP Laboratory'},
-    ],
-    '3rd': [
-      {code:'MCA0301C', name:'Database Management Systems'},
-      {code:'MCA0302C', name:'Data Communication & Computer Network'},
-      {code:'MCA0010E', name:'Elective I'},
-      {code:'MCA0015E', name:'Elective II'},
-      {code:'MCA0303C', name:'Database Management Systems Laboratory'},
-      {code:'MCA0304C', name:'Computer Network Laboratory'},
-      {code:'MCA0305C', name:'Project Phase I'},
-    ],
-    '4th': [
-      {code:'MCA0401C', name:'Software Engineering'},
-      {code:'MCA0402C', name:'Cloud Computing'},
-      {code:'MCA0403C', name:'Elective III'},
-      {code:'MCA0404C', name:'Elective IV'},
-      {code:'MCA0405C', name:'Project Phase II'},
-    ]
-  },
-  'M.Tech': {
-    '1st': [
-      {code:'MT101', name:'Advanced Algorithms'},
-      {code:'MT102', name:'Research Methodology'},
-      {code:'MT103', name:'Advanced Networks'},
-      {code:'MT104', name:'Embedded Systems'},
-      {code:'MT105', name:'Digital Signal Processing'},
-    ],
-    '2nd': [
-      {code:'MT201', name:'Machine Learning'},
-      {code:'MT202', name:'VLSI Design'},
-      {code:'MT203', name:'Advanced DBMS'},
-      {code:'MT204', name:'Wireless Networks'},
-      {code:'MT205', name:'Seminar'},
-    ],
-    '3rd': [
-      {code:'MT301', name:'Dissertation Phase I'},
-      {code:'MT302', name:'Elective I'},
-      {code:'MT303', name:'Elective II'},
-    ],
-    '4th': [
-      {code:'MT401', name:'Dissertation Phase II'},
-    ]
-  }
-};
+        // Show camera view
+        document.getElementById("cameraStart").style.display = "none";
+        document.getElementById("cameraView").style.display = "block";
+        setStatus("yellow", "Starting camera...");
 
-// ── TIMETABLE — Day wise subject codes ──
-const TIMETABLE = {
-  'MCA': {
-    '1st Semester': {
-      'Mon': ['MCA0103C','MCA0102C'],
-      'Tue': ['CSK-III','MCA0105C'],
-      'Wed': ['MCA0101C','MCA0103C','MCA0104C'],
-      'Thu': ['CSK-III','MCA0101C','MCA0104C'],
-      'Fri': ['MCA0102C','MCA0105C'],
-      'Sat': [],
-      'Sun': []
-    },
-    '2nd Semester': {
-      'Mon': ['MCA0201C','MCA0202C'],
-      'Tue': ['MCA0203C','MCA0204C'],
-      'Wed': ['MCA0201C','MCA0205C'],
-      'Thu': ['MCA0202C','MCA0206C'],
-      'Fri': ['MCA0203C','MCA0204C'],
-      'Sat': [],
-      'Sun': []
-    },
-    '3rd Semester': {
-      'Mon': ['MCA0305C','MCA0303C','MCA0010E','MCA0015E'],
-      'Tue': ['MCA0301C','MCA0010E','MCA0015E','MCA0305C'],
-      'Wed': ['MCA0305C','MCA0302C','MCA0304C','MCA0010E'],
-      'Thu': ['MCA0305C','MCA0302C','MCA0304C'],
-      'Fri': ['MCA0303C','MCA0015E','MCA0301C','MCA0305C'],
-      'Sat': [],
-      'Sun': []
-    },
-    '4th Semester': {
-      'Mon': ['MCA0401C','MCA0402C'],
-      'Tue': ['MCA0403C','MCA0405C'],
-      'Wed': ['MCA0401C','MCA0404C'],
-      'Thu': ['MCA0402C','MCA0405C'],
-      'Fri': ['MCA0403C','MCA0404C'],
-      'Sat': [],
-      'Sun': []
-    }
-  },
-  'M.Tech': {
-    '1st Semester': {
-      'Mon': ['MT101','MT102'],
-      'Tue': ['MT103','MT104'],
-      'Wed': ['MT101','MT105'],
-      'Thu': ['MT102','MT104'],
-      'Fri': ['MT103','MT105'],
-      'Sat': [],
-      'Sun': []
-    },
-    '2nd Semester': {
-      'Mon': ['MT201','MT202'],
-      'Tue': ['MT203','MT204'],
-      'Wed': ['MT201','MT205'],
-      'Thu': ['MT202','MT203'],
-      'Fri': ['MT204','MT205'],
-      'Sat': [],
-      'Sun': []
-    },
-    '3rd Semester': {
-      'Mon': ['MT301','MT302'],
-      'Tue': ['MT301','MT303'],
-      'Wed': ['MT301','MT302'],
-      'Thu': ['MT301','MT303'],
-      'Fri': ['MT301'],
-      'Sat': [],
-      'Sun': []
-    },
-    '4th Semester': {
-      'Mon': ['MT401'],
-      'Tue': ['MT401'],
-      'Wed': ['MT401'],
-      'Thu': ['MT401'],
-      'Fri': ['MT401'],
-      'Sat': [],
-      'Sun': []
-    }
-  }
-};
+        showLoading("Starting camera...");
 
-// Day index to short name
-const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        // First, request permission explicitly
+        try {
+          // Request camera permission first
+          const permissionStatus = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+          // If we get here, permission was granted - stop and restart properly
+          permissionStatus.getTracks().forEach((track) => track.stop());
+        } catch (permErr) {
+          // Permission denied or error
+          hideLoading();
+          setStatus("red", "Camera permission denied");
+          showAlert(
+            "mainAlert",
+            '<i class="fa-solid fa-circle-exclamation"></i> Camera permission denied. Please click the camera icon in the browser address bar and allow camera access.',
+            "alert-warn"
+          );
+          document.getElementById("cameraStart").style.display = "block";
+          document.getElementById("cameraView").style.display = "none";
+          return;
+        }
 
-// Semester to year mapping
-const SEM_TO_YEAR = {
-  '1st Semester':'1st','2nd Semester':'1st',
-  '3rd Semester':'2nd','4th Semester':'2nd'
-};
+        try {
+          // Load models if not already loaded
+          if (!modelsLoaded) {
+            showLoading("Loading AI face recognition models...");
+            await loadModels();
+            modelsLoaded = true;
+            await loadAllDescriptors();
+          }
+          await startCamera();
+          hideLoading();
+          setStatus("green", "Camera ready — click Scan My Face");
+          document.getElementById("btnScan").disabled = false;
+        } catch (err) {
+          hideLoading();
+          setStatus("red", "Error: " + err.message);
 
-// ── STATE ──
-let student = null;
-let selectedSubject = null;
-let modelsLoaded = false;
-let stream = null;
-let studentDescriptor = null;
-let allDescriptors = [];
-let scanInProgress = false;
-// Track subjects already marked today (client-side — resets on refresh)
-const markedToday = new Set();
-const markedStatus = {}; // Track status: { 'MCA0102C': 'Present' or 'Absent' }
+          // More specific error messages
+          let errorMsg = err.message;
+          if (
+            err.name === "NotFoundError" ||
+            err.message.includes("Requested device not found")
+          ) {
+            errorMsg =
+              "No camera found! Please connect a webcam and refresh the page.";
+          } else if (err.name === "NotAllowedError") {
+            errorMsg = "Camera blocked! Allow camera in browser settings.";
+          } else if (err.name === "NotReadableError") {
+            errorMsg =
+              "Camera in use by another app! Close other apps using camera.";
+          }
 
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', async () => {
-  // Set date
-  document.getElementById('dateDisplay').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-
-  // Get student from localStorage
-  const stored = localStorage.getItem('student');
-  if (!stored) { window.location.href = 'login.html'; return; }
-  student = JSON.parse(stored);
-  document.getElementById('navName').textContent = student.name.split(' ')[0];
-
-  // Render subjects based on today's day
-  renderSubjects();
-
-  // Load models + fetch already-marked subjects in parallel
-  try {
-    // Show loading state on subject buttons
-    showAlert('infoAlert', '<i class="fa-solid fa-spinner fa-spin"></i> Checking your attendance records...', 'alert-info');
-    
-    const today = formatDate(new Date());
-    const [, , , ] = await Promise.all([
-      loadModels().then(() => { modelsLoaded = true; }),
-      loadAllDescriptors(),
-      loadAlreadyMarkedToday(), // fetch marked subjects → re-renders buttons
-      loadAttendanceControlFromSheet(today) // fetch attendance control state from sheet
-    ]);
-    
-    hideAlert('infoAlert');
-  } catch(err) {
-    hideAlert('infoAlert');
-  }
-
-  loadMyStats();
-
-  // ── AUTO REFRESH attendance control every 10 seconds ──
-  setInterval(async () => {
-    const today = formatDate(new Date());
-    await loadAttendanceControlFromSheet(today);
-    renderSubjects();
-  }, 10000);
-
-  // Re-check marked subjects when student returns to page (tab focus)
-  document.addEventListener('visibilitychange', async () => {
-    if(document.visibilityState === 'visible'){
-      const today = formatDate(new Date());
-      await loadAlreadyMarkedToday();
-      await loadAttendanceControlFromSheet(today);
-      renderSubjects(); // Re-render to show updated enabled/disabled state
-    }
-  });
-});
-
-async function beginAttendanceCamera(){
-  if(!selectedSubject){
-    showAlert('mainAlert','<i class="fa-solid fa-triangle-exclamation"></i> Please select a subject first before starting camera!','alert-warn');
-    return;
-  }
-
-  // ── Check if attendance is enabled by faculty ──
-  const today = formatDate(new Date());
-  if(!isAttendanceEnabled(selectedSubject.code, today)){
-    showAlert('mainAlert','<i class="fa-solid fa-lock"></i> Attendance is currently <b>disabled</b> for this subject. Please contact your faculty to enable it.','alert-warn');
-    return;
-  }
-
-  // ── Check if this subject is already marked today ──
-  if(markedToday.has(selectedSubject.code) || markedToday.has(selectedSubject.name)){
-    showAlert('mainAlert',
-      `You already marked attendance for <b>${selectedSubject.name}</b> today!`,
-      'alert-warn');
-    // Reset selection
-    document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('selected'));
-    selectedSubject = null;
-    return;
-  }
-
-  // Show camera view
-  document.getElementById('cameraStart').style.display = 'none';
-  document.getElementById('cameraView').style.display = 'block';
-  setStatus('yellow','Starting camera...');
-
-  showLoading('Starting camera...');
-
-  // First, request permission explicitly
-  try{
-    // Request camera permission first
-    const permissionStatus = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
-    // If we get here, permission was granted - stop and restart properly
-    permissionStatus.getTracks().forEach(track => track.stop());
-  } catch(permErr) {
-    // Permission denied or error
-    hideLoading();
-    setStatus('red','Camera permission denied');
-    showAlert('mainAlert','<i class="fa-solid fa-circle-exclamation"></i> Camera permission denied. Please click the camera icon in the browser address bar and allow camera access.','alert-warn');
-    document.getElementById('cameraStart').style.display = 'block';
-    document.getElementById('cameraView').style.display = 'none';
-    return;
-  }
-
-  try{
-    // Load models if not already loaded
-    if(!modelsLoaded){
-      showLoading('Loading AI face recognition models...');
-      await loadModels();
-      modelsLoaded = true;
-      await loadAllDescriptors();
-    }
-    await startCamera();
-    hideLoading();
-    setStatus('green','Camera ready — click Scan My Face');
-    document.getElementById('btnScan').disabled = false;
-  }catch(err){
-    hideLoading();
-    setStatus('red','Error: '+err.message);
-
-    // More specific error messages
-    let errorMsg = err.message;
-    if(err.name === 'NotFoundError' || err.message.includes('Requested device not found')){
-      errorMsg = 'No camera found! Please connect a webcam and refresh the page.';
-    } else if(err.name === 'NotAllowedError'){
-      errorMsg = 'Camera blocked! Allow camera in browser settings.';
-    } else if(err.name === 'NotReadableError'){
-      errorMsg = 'Camera in use by another app! Close other apps using camera.';
-    }
-
-    showAlert('mainAlert','<i class="fa-solid fa-circle-exclamation"></i> '+errorMsg,'alert-warn');
-    // Show start button again on error
-    document.getElementById('cameraStart').style.display = 'block';
-    document.getElementById('cameraView').style.display = 'none';
-  }
-}
-
-// ── LOAD MODELS ──
-async function loadModels() {
-  await Promise.all([
-    faceapi.nets.tinyFaceDetector.loadFromUri(FACE_API_URL),
-    faceapi.nets.faceLandmark68TinyNet.loadFromUri(FACE_API_URL),
-    faceapi.nets.faceRecognitionNet.loadFromUri(FACE_API_URL)
-  ]);
-}
-
-// ── START CAMERA ──
-async function startCamera() {
-  // Try different camera configurations
-  const configs = [
-    { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
-    { facingMode: 'user' },
-    { facingMode: undefined, width: { ideal: 640 }, height: { ideal: 480 } },
-    true // Last resort - any camera
-  ];
-
-  let lastError = null;
-
-  for (let i = 0; i < configs.length; i++) {
-    try {
-      let config = configs[i];
-      if (config === true) {
-        // Any video device
-        config = { video: true };
+          showAlert(
+            "mainAlert",
+            '<i class="fa-solid fa-circle-exclamation"></i> ' + errorMsg,
+            "alert-warn"
+          );
+          // Show start button again on error
+          document.getElementById("cameraStart").style.display = "block";
+          document.getElementById("cameraView").style.display = "none";
+        }
       }
 
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera API not supported');
+      // ── LOAD MODELS ──
+      async function loadModels() {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri(FACE_API_URL),
+          faceapi.nets.faceLandmark68TinyNet.loadFromUri(FACE_API_URL),
+          faceapi.nets.faceRecognitionNet.loadFromUri(FACE_API_URL),
+        ]);
       }
 
-      stream = await navigator.mediaDevices.getUserMedia(config);
-      const video = document.getElementById('video');
-      video.srcObject = stream;
-      video.onloadedmetadata = () => video.play();
-      await new Promise(r => setTimeout(r, 800));
-      return; // Success!
-    } catch(err) {
-      lastError = err;
-      console.log('Camera config ' + i + ' failed:', err.message);
-      if (stream) {
-        try { stream.getTracks().forEach(t => t.stop()); } catch(e) {}
-        stream = null;
+      // ── START CAMERA ──
+      async function startCamera() {
+        // Try different camera configurations
+        const configs = [
+          { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+          { facingMode: "user" },
+          {
+            facingMode: undefined,
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+          },
+          true, // Last resort - any camera
+        ];
+
+        let lastError = null;
+
+        for (let i = 0; i < configs.length; i++) {
+          try {
+            let config = configs[i];
+            if (config === true) {
+              // Any video device
+              config = { video: true };
+            }
+
+            if (
+              !navigator.mediaDevices ||
+              !navigator.mediaDevices.getUserMedia
+            ) {
+              throw new Error("Camera API not supported");
+            }
+
+            stream = await navigator.mediaDevices.getUserMedia(config);
+            const video = document.getElementById("video");
+            video.srcObject = stream;
+            video.onloadedmetadata = () => video.play();
+            await new Promise((r) => setTimeout(r, 800));
+            return; // Success!
+          } catch (err) {
+            lastError = err;
+            console.log("Camera config " + i + " failed:", err.message);
+            if (stream) {
+              try {
+                stream.getTracks().forEach((t) => t.stop());
+              } catch (e) {}
+              stream = null;
+            }
+          }
+        }
+
+        // All configs failed
+        console.error("All camera configs failed:", lastError);
+        throw new Error(lastError.message || "Could not access camera");
       }
-    }
-  }
 
-  // All configs failed
-  console.error('All camera configs failed:', lastError);
-  throw new Error(lastError.message || 'Could not access camera');
-}
+      // ── LOAD ALREADY MARKED TODAY — fetch fresh from sheet ──
+      async function loadAlreadyMarkedToday() {
+        try {
+          const today = formatDate(new Date());
+          const r = await fetch(`${SHEET_URL}?action=getAllAttendance`);
+          const j = await r.json();
+          const records = j.records || [];
 
-// ── LOAD ALREADY MARKED TODAY — fetch fresh from sheet ──
-async function loadAlreadyMarkedToday(){
-  try{
-    const today = formatDate(new Date());
-    const r = await fetch(`${SHEET_URL}?action=getAllAttendance`);
-    const j = await r.json();
-    const records = j.records || [];
+          const todayMine = records.filter((rec) => {
+            const recEnroll = rec.enrollment.toString().trim();
+            const studEnroll = student.enrollment.toString().trim();
+            const recDate = normalizeDate(rec.date);
+            return recEnroll === studEnroll && recDate === today;
+          });
 
-    const todayMine = records.filter(rec => {
-      const recEnroll = rec.enrollment.toString().trim();
-      const studEnroll = student.enrollment.toString().trim();
-      const recDate = normalizeDate(rec.date);
-      return recEnroll === studEnroll && recDate === today;
-    });
+          // Reset and rebuild markedToday Set from fresh data
+          markedToday.clear();
 
-    // Reset and rebuild markedToday Set from fresh data
-    markedToday.clear();
+          const year = SEM_TO_YEAR[student.semester] || "1st";
+          const allSubs = (SUBJECTS[student.course] || {})[year] || [];
 
-    const year = SEM_TO_YEAR[student.semester] || '1st';
-    const allSubs = (SUBJECTS[student.course]||{})[year]||[];
+          todayMine.forEach((rec) => {
+            const found = allSubs.find(
+              (s) =>
+                s.name === rec.subject ||
+                s.code === rec.subject ||
+                s.code === rec.subjectCode
+            );
+            const subjKey = found ? found.code : rec.subject;
+            const status = rec.status || "Present";
 
-    todayMine.forEach(rec => {
-      const found = allSubs.find(s =>
-        s.name === rec.subject ||
-        s.code === rec.subject ||
-        s.code === rec.subjectCode
-      );
-      const subjKey = found ? found.code : rec.subject;
-      const status = rec.status || 'Present';
+            markedToday.add(subjKey);
+            markedStatus[subjKey] = status; // Store actual status
 
-      markedToday.add(subjKey);
-      markedStatus[subjKey] = status; // Store actual status
+            if (found) {
+              markedToday.add(found.name);
+              markedStatus[found.name] = status;
+            }
+          });
 
-      if(found){
-        markedToday.add(found.name);
-        markedStatus[found.name] = status;
+          // Always re-render subjects if camera is not open
+          if (!stream) renderSubjects();
+        } catch (e) {
+          // Silently fail — markedToday stays as-is
+        }
       }
-    });
 
-    // Always re-render subjects if camera is not open
-    if(!stream) renderSubjects();
+      // ── LOAD ALL STUDENT DESCRIPTORS FROM SHEET ──
+      async function loadAllDescriptors() {
+        try {
+          const r = await fetch(SHEET_URL + "?action=getDescriptors");
+          const j = await r.json();
+          allDescriptors = j.students || [];
+        } catch (e) {
+          allDescriptors = [];
+        }
+      }
 
-  }catch(e){
-    // Silently fail — markedToday stays as-is
-  }
-}
+      // ── RENDER SUBJECTS — Day based filtering from timetable ──
+      function renderSubjects() {
+        const grid = document.getElementById("subjectGrid");
+        const sem = student.semester;
+        const course = student.course;
+        const year = SEM_TO_YEAR[sem] || "1st";
+        const dayIdx = new Date().getDay(); // 0=Sun,1=Mon...6=Sat
+        const today = formatDate(new Date());
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const dayFull = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const todayName = dayNames[dayIdx];
 
-// ── LOAD ALL STUDENT DESCRIPTORS FROM SHEET ──
-async function loadAllDescriptors() {
-  try {
-    const r = await fetch(SHEET_URL + '?action=getDescriptors');
-    const j = await r.json();
-    allDescriptors = j.students || [];
-  } catch(e) {
-    allDescriptors = [];
-  }
-}
+        // Load cancelled classes from localStorage
+        let cancelledDates = [];
+        try {
+          cancelledDates = JSON.parse(
+            localStorage.getItem("cancelledClasses") || "[]"
+          );
+        } catch (e) {}
 
-// ── RENDER SUBJECTS — Day based filtering from timetable ──
-function renderSubjects() {
-  const grid = document.getElementById('subjectGrid');
-  const sem    = student.semester;
-  const course = student.course;
-  const year   = SEM_TO_YEAR[sem] || '1st';
-  const dayIdx = new Date().getDay(); // 0=Sun,1=Mon...6=Sat
-  const today  = formatDate(new Date());
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const dayFull  = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const todayName = dayNames[dayIdx];
-
-  // Load cancelled classes from localStorage
-  let cancelledDates = [];
-  try{ cancelledDates = JSON.parse(localStorage.getItem('cancelledClasses')||'[]'); }catch(e){}
-
-  // ── COMING SOON CHECK ──
-  const semTimetable = (TIMETABLE[course]||{})[sem];
-  if(!semTimetable || semTimetable === 'coming_soon'){
-    grid.innerHTML = `
+        // ── COMING SOON CHECK ──
+        const semTimetable = (TIMETABLE[course] || {})[sem];
+        if (!semTimetable || semTimetable === "coming_soon") {
+          grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:32px 20px">
         <div style="font-size:48px;margin-bottom:12px;color:var(--primary-pale)"><i class="fa-solid fa-clock"></i></div>
         <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">Coming Soon</div>
         <div style="font-size:13px;color:var(--text-secondary);font-weight:500">Subjects for <b>${sem}</b> are yet to be updated.<br>Please contact your department.</div>
       </div>`;
-    document.getElementById('btnScan').disabled = true;
-    document.getElementById('cameraStart').style.display = 'none';
-    return;
-  }
+          document.getElementById("btnScan").disabled = true;
+          document.getElementById("cameraStart").style.display = "none";
+          return;
+        }
 
-  // ── WEEKEND CHECK ──
-  if(dayIdx === 0 || dayIdx === 6){
-    grid.innerHTML = `
+        // ── WEEKEND CHECK ──
+        if (dayIdx === 0 || dayIdx === 6) {
+          grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:32px 20px">
         <div style="font-size:48px;margin-bottom:12px;color:var(--primary-pale)"><i class="fa-solid fa-glass-cheers"></i></div>
         <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">No Classes Today!</div>
         <div style="font-size:13px;color:var(--text-secondary);font-weight:500">Enjoy your ${dayFull[dayIdx]}. See you on Monday!</div>
       </div>`;
-    document.getElementById('btnScan').disabled = true;
-    document.getElementById('cameraStart').style.display = 'none';
-    return;
-  }
+          document.getElementById("btnScan").disabled = true;
+          document.getElementById("cameraStart").style.display = "none";
+          return;
+        }
 
-  // ── GET TODAY'S SUBJECT CODES FROM TIMETABLE ──
-  const todayCodes = semTimetable[todayName] || [];
-  if(todayCodes.length === 0){
-    grid.innerHTML = `
+        // ── GET TODAY'S SUBJECT CODES FROM TIMETABLE ──
+        const todayCodes = semTimetable[todayName] || [];
+        if (todayCodes.length === 0) {
+          grid.innerHTML = `
       <div style="grid-column:1/-1;text-align:center;padding:32px 20px">
         <div style="font-size:48px;margin-bottom:12px;color:var(--primary-pale)"><i class="fa-regular fa-calendar-xmark"></i></div>
         <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);margin-bottom:6px">No Classes Today</div>
         <div style="font-size:13px;color:var(--text-secondary);font-weight:500">No subjects scheduled for <b>${dayFull[dayIdx]}</b>.</div>
       </div>`;
-    document.getElementById('btnScan').disabled = true;
-    document.getElementById('cameraStart').style.display = 'none';
-    return;
-  }
+          document.getElementById("btnScan").disabled = true;
+          document.getElementById("cameraStart").style.display = "none";
+          return;
+        }
 
-  // ── MATCH CODES TO SUBJECT OBJECTS ──
-  const allSubs = (SUBJECTS[course]||{})[year]||[];
-  const seen = new Set();
-  const todaySubjects = [];
-  todayCodes.forEach(code => {
-    if(seen.has(code)) return;
-    seen.add(code);
-    const found = allSubs.find(s => s.code === code);
-    if(found) todaySubjects.push(found);
-    else todaySubjects.push({code, name: code});
-  });
+        // ── MATCH CODES TO SUBJECT OBJECTS ──
+        const allSubs = (SUBJECTS[course] || {})[year] || [];
+        const seen = new Set();
+        const todaySubjects = [];
+        todayCodes.forEach((code) => {
+          if (seen.has(code)) return;
+          seen.add(code);
+          const found = allSubs.find((s) => s.code === code);
+          if (found) todaySubjects.push(found);
+          else todaySubjects.push({ code, name: code });
+        });
 
-  // ── CANCELLED SUBJECTS TODAY ──
-  const cancelledToday = cancelledDates
-    .filter(c => c.date === today)
-    .map(c => c.subject);
+        // ── CANCELLED SUBJECTS TODAY ──
+        const cancelledToday = cancelledDates
+          .filter((c) => c.date === today)
+          .map((c) => c.subject);
 
-  // ── RENDER ──
-  grid.innerHTML = `
+        // ── RENDER ──
+        grid.innerHTML = `
     <div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin-bottom:4px">
-      <span style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px"><i class="fa-regular fa-calendar"></i> ${dayFull[dayIdx]}'s Subjects</span>
-      <span style="background:var(--primary-pale);color:var(--primary);border-radius:50px;padding:2px 10px;font-size:11px;font-weight:700">${todaySubjects.length} subject${todaySubjects.length>1?'s':''}</span>
+      <span style="font-size:11px;font-weight:800;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px"><i class="fa-regular fa-calendar"></i> ${
+        dayFull[dayIdx]
+      }'s Subjects</span>
+      <span style="background:var(--primary-pale);color:var(--primary);border-radius:50px;padding:2px 10px;font-size:11px;font-weight:700">${
+        todaySubjects.length
+      } subject${todaySubjects.length > 1 ? "s" : ""}</span>
     </div>
-    ${cancelledToday.length > 0 ? `
+    ${
+      cancelledToday.length > 0
+        ? `
       <div style="grid-column:1/-1;background:linear-gradient(135deg,#fffbeb,#fff);border:1px solid #fed7aa;border-radius:var(--radius-md);padding:10px 14px;font-size:12px;font-weight:600;color:#c05c00;margin-bottom:4px">
         <i class="fa-solid fa-circle-exclamation"></i> Some classes are cancelled today.
-      </div>` : ''}
-    ${todaySubjects.map(s => {
-      const isCancelled = cancelledToday.includes(s.name);
-      const isMarked    = markedToday.has(s.code) || markedToday.has(s.name);
-      const status      = markedStatus[s.code] || markedStatus[s.name] || 'Present';
-      const isEnabled   = isAttendanceEnabled(s.code, today);
+      </div>`
+        : ""
+    }
+    ${todaySubjects
+      .map((s) => {
+        const isCancelled = cancelledToday.includes(s.name);
+        const isMarked = markedToday.has(s.code) || markedToday.has(s.name);
+        const status =
+          markedStatus[s.code] || markedStatus[s.name] || "Present";
+        const isEnabled = isAttendanceEnabled(s.code, today);
 
-      if(isCancelled){
-        return `<button class="subj-btn" disabled style="opacity:.5;cursor:not-allowed;background:#fef2f2;border-color:#fecaca" data-code="${s.code}">
+        if (isCancelled) {
+          return `<button class="subj-btn" disabled style="opacity:.5;cursor:not-allowed;background:#fef2f2;border-color:#fecaca" data-code="${s.code}">
           <span class="subj-code" style="background:#fee2e2;color:var(--err)">${s.code}</span>
           ${s.name}<span style="font-size:10px;display:block;color:var(--err);font-weight:600;margin-top:3px"><i class="fa-solid fa-ban"></i> Class Cancelled Today</span>
         </button>`;
-      }
-      if(!isEnabled && !isMarked){
-        // Disabled by faculty
-        return `<button class="subj-btn" disabled style="opacity:.7;cursor:not-allowed;background:#f1f5f9;border-color:#cbd5e1" data-code="${s.code}">
+        }
+        if (!isEnabled && !isMarked) {
+          // Disabled by faculty
+          return `<button class="subj-btn" disabled style="opacity:.7;cursor:not-allowed;background:#f1f5f9;border-color:#cbd5e1" data-code="${s.code}">
           <span class="subj-code" style="color:#64748b">${s.code}</span>
           ${s.name}<span style="font-size:10px;display:block;color:#64748b;font-weight:600;margin-top:3px"><i class="fa-solid fa-lock"></i> Attendance Disabled</span>
         </button>`;
-      }
-      if(isMarked){
-        if(status === 'Absent'){
-          // Red when faculty marked Absent
-          return `<button class="subj-btn" disabled style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;cursor:not-allowed;opacity:.85" data-code="${s.code}">
+        }
+        if (isMarked) {
+          if (status === "Absent") {
+            // Red when faculty marked Absent
+            return `<button class="subj-btn" disabled style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;cursor:not-allowed;opacity:.85" data-code="${s.code}">
             <span class="subj-code" style="background:transparent;color:#fff;font-weight:800;opacity:1">${s.code}</span>
             <i class="fa-solid fa-xmark"></i> ${s.name}<span style="font-size:10px;display:block;color:rgba(255,255,255,.8);font-weight:600;margin-top:3px">Marked Absent by Faculty</span>
           </button>`;
-        }
-        // Green when Present
-        return `<button class="subj-btn" disabled style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;cursor:not-allowed;opacity:.85" data-code="${s.code}">
+          }
+          // Green when Present
+          return `<button class="subj-btn" disabled style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;cursor:not-allowed;opacity:.85" data-code="${s.code}">
           <span class="subj-code" style="background:transparent;color:#fff;font-weight:800;opacity:1">${s.code}</span>
           <i class="fa-solid fa-check"></i> ${s.name}<span style="font-size:10px;display:block;color:rgba(255,255,255,.8);font-weight:600;margin-top:3px">Already marked today</span>
         </button>`;
-      }
-      return `<button class="subj-btn" data-code="${s.code}" onclick="selectSubject('${s.code}','${s.name.replace(/'/g,"\\'")}',this)">
+        }
+        const glowClass = isEnabled ? "glow-enabled" : "";
+        return `<button class="subj-btn ${glowClass}" data-code="${
+          s.code
+        }" onclick="selectSubject('${s.code}','${s.name.replace(
+          /'/g,
+          "\\'"
+        )}',this)">
         <span class="subj-code">${s.code}</span>
         ${s.name}
       </button>`;
-    }).join('')}
+      })
+      .join("")}
   `;
-}
+      }
 
-// ── SELECT SUBJECT ──
-function selectSubject(code, name, btn) {
-  // Check if attendance is enabled by faculty
-  const today = formatDate(new Date());
-  if (!isAttendanceEnabled(code, today)) {
-    showAlert('mainAlert', `<i class="fa-solid fa-lock"></i> Attendance is currently <b>disabled</b> for ${name}. Please contact your faculty to enable it.`, 'alert-warn');
-    return;
-  }
-
-  document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  selectedSubject = { code, name };
-  showAlert('infoAlert', `<i class="fa-solid fa-book"></i> Subject selected: <b>${name}</b> — now scan your face`, 'alert-info');
-}
-
-// ── SCAN FACE ──
-async function scanFace() {
-  if (!selectedSubject) {
-    showAlert('mainAlert', '<i class="fa-solid fa-circle-exclamation"></i> Please select a subject first!', 'alert-warn');
-    return;
-  }
-  if (scanInProgress) return;
-  scanInProgress = true;
-
-  const btn = document.getElementById('btnScan');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
-  setStatus('yellow', 'Detecting your face...');
-  hideAlert('mainAlert'); hideAlert('infoAlert');
-
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('overlay');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  try {
-    // Detect face
-    const detection = await faceapi
-      .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 320, scoreThreshold: 0.5 }))
-      .withFaceLandmarks(true)
-      .withFaceDescriptor();
-
-    if (!detection) {
-      setStatus('red', 'No face detected — please look at the camera');
-      showAlert('mainAlert', '<i class="fa-solid fa-circle-xmark"></i> No face detected. Make sure your face is visible and well-lit.', 'alert-warn');
-      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-      scanInProgress = false;
-      return;
-    }
-
-    // Draw detection
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const dims = faceapi.matchDimensions(canvas, video, true);
-    const resized = faceapi.resizeResults(detection, dims);
-    faceapi.draw.drawDetections(canvas, resized);
-
-    setStatus('yellow', 'Matching face with database...');
-
-    // Match against all stored descriptors
-    const scannedDescriptor = detection.descriptor;
-    let matchedStudent = null;
-    let bestDistance = 0.55; // threshold — lower = stricter
-
-    // Check against ALL descriptors loaded from sheet
-    for (const s of allDescriptors) {
-      if (!s.faceDescriptor) continue;
-      try {
-        const parsed = JSON.parse(s.faceDescriptor);
-        const desc = new Float32Array(parsed);
-        const dist = faceapi.euclideanDistance(scannedDescriptor, desc);
-        if (dist < bestDistance) {
-          bestDistance = dist;
-          matchedStudent = s;
+      // ── SELECT SUBJECT ──
+      function selectSubject(code, name, btn) {
+        // Check if attendance is enabled by faculty
+        const today = formatDate(new Date());
+        if (!isAttendanceEnabled(code, today)) {
+          showAlert(
+            "mainAlert",
+            `<i class="fa-solid fa-lock"></i> Attendance is currently <b>disabled</b> for ${name}. Please contact your faculty to enable it.`,
+            "alert-warn"
+          );
+          return;
         }
-      } catch(e) {}
-    }
 
-    // Also check student's own stored descriptor from localStorage as fallback
-    if (!matchedStudent && student.faceDescriptor) {
-      try {
-        const stored = new Float32Array(JSON.parse(student.faceDescriptor));
-        const dist = faceapi.euclideanDistance(scannedDescriptor, stored);
-        if (dist < bestDistance) {
-          bestDistance = dist;
-          matchedStudent = student;
+        document
+          .querySelectorAll(".subj-btn")
+          .forEach((b) => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        selectedSubject = { code, name };
+        showAlert(
+          "infoAlert",
+          `<i class="fa-solid fa-book"></i> Subject selected: <b>${name}</b>  now scan your face`,
+          "alert-info"
+        );
+      }
+
+      // ── SCAN FACE ──
+      async function scanFace() {
+        if (!selectedSubject) {
+          showAlert(
+            "mainAlert",
+            '<i class="fa-solid fa-circle-exclamation"></i> Please select a subject first!',
+            "alert-warn"
+          );
+          return;
         }
-      } catch(e) {}
-    }
+        if (scanInProgress) return;
+        scanInProgress = true;
 
-    if (!matchedStudent) {
-      setStatus('red', 'Face not recognized');
-      showResult('error', '<i class="fa-solid fa-face-frown"></i> Face Not Recognized',
-        'Your face could not be matched. Please register first or try again in better lighting.');
-      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-      scanInProgress = false;
-      return;
-    }
+        const btn = document.getElementById("btnScan");
+        btn.disabled = true;
+        btn.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin"></i> Scanning...';
+        setStatus("yellow", "Detecting your face...");
+        hideAlert("mainAlert");
+        hideAlert("infoAlert");
 
-    // ── CLIENT SIDE DUPLICATE CHECK ──
-    if(markedToday.has(selectedSubject.code) || markedToday.has(selectedSubject.name)){
-      setStatus('yellow','<i class="fa-solid fa-check-double"></i> Already marked today');
-      showResult('warning','<i class="fa-solid fa-triangle-exclamation"></i> Already Marked',
-        `You already marked attendance for <b>${selectedSubject.name}</b> today.<br>Each subject can only be marked once per day.`);
-      btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-camera"></i> Scan My Face';
-      scanInProgress=false;
-      return;
-    }
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("overlay");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-    // Check if already marked for this subject today
-    setStatus('yellow', 'Checking previous attendance...');
-    const alreadyMarked = await checkAlreadyMarked(matchedStudent.enrollment, selectedSubject.code);
-    if (alreadyMarked) {
-      setStatus('yellow', 'Already marked present');
-      showResult('warning', '<i class="fa-solid fa-triangle-exclamation"></i> Already Marked',
-        `You are already marked <b>Present</b> for <b>${selectedSubject.name}</b> today.`);
-      btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-      scanInProgress = false;
-      return;
-    }
+        try {
+          // Detect face
+          const detection = await faceapi
+            .detectSingleFace(
+              video,
+              new faceapi.TinyFaceDetectorOptions({
+                inputSize: 320,
+                scoreThreshold: 0.5,
+              })
+            )
+            .withFaceLandmarks(true)
+            .withFaceDescriptor();
 
-    // Save attendance
-    setStatus('yellow', 'Saving attendance...');
-    await saveAttendance(matchedStudent);
+          if (!detection) {
+            setStatus("red", "No face detected — please look at the camera");
+            showAlert(
+              "mainAlert",
+              '<i class="fa-solid fa-circle-xmark"></i> No face detected. Make sure your face is visible and well-lit.',
+              "alert-warn"
+            );
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
+            scanInProgress = false;
+            return;
+          }
 
-    // ── Mark as done client-side ──
-    markedToday.add(selectedSubject.code);
-    markedToday.add(selectedSubject.name);
+          // Draw detection
+          const ctx = canvas.getContext("2d");
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          const dims = faceapi.matchDimensions(canvas, video, true);
+          const resized = faceapi.resizeResults(detection, dims);
+          faceapi.draw.drawDetections(canvas, resized);
 
-    // ── Immediately disable the subject button ──
-    document.querySelectorAll('.subj-btn').forEach(b => {
-      if(b.dataset.code === selectedSubject.code){
-        b.disabled = true;
-        b.onclick = null;
-        b.classList.remove('selected');
-        b.style.cssText = 'background:linear-gradient(120deg,var(--b1),var(--b2));color:#fff;cursor:not-allowed;opacity:1;border-color:var(--b1)';
-        b.innerHTML = `
+          setStatus("yellow", "Matching face with database...");
+
+          // Match against all stored descriptors
+          const scannedDescriptor = detection.descriptor;
+          let matchedStudent = null;
+          let bestDistance = 0.55; // threshold — lower = stricter
+
+          // Check against ALL descriptors loaded from sheet
+          for (const s of allDescriptors) {
+            if (!s.faceDescriptor) continue;
+            try {
+              const parsed = JSON.parse(s.faceDescriptor);
+              const desc = new Float32Array(parsed);
+              const dist = faceapi.euclideanDistance(scannedDescriptor, desc);
+              if (dist < bestDistance) {
+                bestDistance = dist;
+                matchedStudent = s;
+              }
+            } catch (e) {}
+          }
+
+          // Also check student's own stored descriptor from localStorage as fallback
+          if (!matchedStudent && student.faceDescriptor) {
+            try {
+              const stored = new Float32Array(
+                JSON.parse(student.faceDescriptor)
+              );
+              const dist = faceapi.euclideanDistance(scannedDescriptor, stored);
+              if (dist < bestDistance) {
+                bestDistance = dist;
+                matchedStudent = student;
+              }
+            } catch (e) {}
+          }
+
+          if (!matchedStudent) {
+            setStatus("red", "Face not recognized");
+            showResult(
+              "error",
+              '<i class="fa-solid fa-face-frown"></i> Face Not Recognized',
+              "Your face could not be matched. Please register first or try again in better lighting."
+            );
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
+            scanInProgress = false;
+            return;
+          }
+
+          // ── CHECK IF FACE MATCHES LOGGED-IN STUDENT ──
+          const loggedInEnrollment = (student.enrollment || "")
+            .toString()
+            .trim();
+          const matchedEnrollment = (matchedStudent.enrollment || "")
+            .toString()
+            .trim();
+          if (
+            loggedInEnrollment &&
+            matchedEnrollment &&
+            loggedInEnrollment !== matchedEnrollment
+          ) {
+            setStatus("red", "Face mismatch");
+            showResult(
+              "error",
+              '<i class="fa-solid fa-user-shield"></i> Face Mismatch',
+              "<b>You are Trying to Mark with Different Face</b><br>Only you can mark your own attendance."
+            );
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
+            scanInProgress = false;
+            // Turn off camera
+            if (stream) {
+              stream.getTracks().forEach((t) => t.stop());
+              stream = null;
+            }
+            document.getElementById("cameraStart").style.display = "block";
+            document.getElementById("cameraView").style.display = "none";
+            return;
+          }
+
+          // ── CLIENT SIDE DUPLICATE CHECK ──
+          if (
+            markedToday.has(selectedSubject.code) ||
+            markedToday.has(selectedSubject.name)
+          ) {
+            setStatus(
+              "yellow",
+              '<i class="fa-solid fa-check-double"></i> Already marked today'
+            );
+            showResult(
+              "warning",
+              '<i class="fa-solid fa-triangle-exclamation"></i> Already Marked',
+              `You already marked attendance for <b>${selectedSubject.name}</b> today.<br>Each subject can only be marked once per day.`
+            );
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
+            scanInProgress = false;
+            return;
+          }
+
+          // Check if already marked for this subject today
+          setStatus("yellow", "Checking previous attendance...");
+          const alreadyMarked = await checkAlreadyMarked(
+            matchedStudent.enrollment,
+            selectedSubject.code
+          );
+          if (alreadyMarked) {
+            setStatus("yellow", "Already marked present");
+            showResult(
+              "warning",
+              '<i class="fa-solid fa-triangle-exclamation"></i> Already Marked',
+              `You are already marked <b>Present</b> for <b>${selectedSubject.name}</b> today.`
+            );
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
+            scanInProgress = false;
+            return;
+          }
+
+          // Save attendance
+          setStatus("yellow", "Saving attendance...");
+          await saveAttendance(matchedStudent);
+
+          // ── Mark as done client-side ──
+          markedToday.add(selectedSubject.code);
+          markedToday.add(selectedSubject.name);
+
+          // ── Immediately disable the subject button ──
+          document.querySelectorAll(".subj-btn").forEach((b) => {
+            if (b.dataset.code === selectedSubject.code) {
+              b.disabled = true;
+              b.onclick = null;
+              b.classList.remove("selected");
+              b.style.cssText =
+                "background:linear-gradient(120deg,var(--b1),var(--b2));color:#fff;cursor:not-allowed;opacity:1;border-color:var(--b1)";
+              b.innerHTML = `
           <span class="subj-code" style="background:rgba(255,255,255,.2);color:#fff">${selectedSubject.code}</span>
           <i class="fa-solid fa-check-double"></i> ${selectedSubject.name}
           <span style="font-size:10px;display:block;color:rgba(255,255,255,.8);font-weight:600;margin-top:3px"><i class="fa-solid fa-check"></i> Attendance marked today</span>`;
+            }
+          });
+
+          setStatus("green", "Attendance marked successfully!");
+          showResult(
+            "success",
+            "Attendance Marked!",
+            `<b>${matchedStudent.name}</b> marked <b>Present</b> for <b>${selectedSubject.name}</b>`,
+            matchedStudent
+          );
+
+          loadMyStats(); // refresh stats
+
+          // ── AUTO STOP CAMERA after 3 seconds ──
+          setTimeout(() => {
+            if (stream) {
+              stream.getTracks().forEach((t) => t.stop());
+              stream = null;
+            }
+            document.getElementById("cameraStart").style.display = "block";
+            document.getElementById("cameraView").style.display = "none";
+            document.getElementById("btnScan").disabled = true;
+            document.getElementById("btnScan").innerHTML =
+              '<i class="fa-solid fa-camera"></i> Scan My Face';
+            selectedSubject = null;
+            // Re-render subjects to reflect latest marked state
+            renderSubjects();
+            showAlert(
+              "infoAlert",
+              '<i class="fa-solid fa-video-slash"></i> Camera turned off. Select another subject to mark attendance.',
+              "alert-info"
+            );
+          }, 3000);
+        } catch (err) {
+          setStatus("red", "Error: " + err.message);
+          showAlert(
+            "mainAlert",
+            '<i class="fa-solid fa-circle-xmark"></i> Error: ' + err.message,
+            "alert-warn"
+          );
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
+        }
+
+        scanInProgress = false;
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
       }
-    });
 
-    setStatus('green', 'Attendance marked successfully!');
-    showResult('success', 'Attendance Marked!',
-      `<b>${matchedStudent.name}</b> marked <b>Present</b> for <b>${selectedSubject.name}</b>`,
-      matchedStudent);
+      // ── CHECK ALREADY MARKED — local check (fast + reliable) ──
+      async function checkAlreadyMarked(enrollment, subjectCode) {
+        try {
+          const today = formatDate(new Date());
 
-    loadMyStats(); // refresh stats
+          // Primary check — markedToday Set (fastest)
+          if (markedToday.has(subjectCode)) return true;
+          if (markedToday.has(selectedSubject.name)) return true;
 
-    // ── AUTO STOP CAMERA after 3 seconds ──
-    setTimeout(() => {
-      if(stream){
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
+          // Secondary check — fetch fresh from sheet
+          const r = await fetch(`${SHEET_URL}?action=getAllAttendance`);
+          const j = await r.json();
+          const records = j.records || [];
+
+          const found = records.some((rec) => {
+            const recEnroll = rec.enrollment.toString().trim();
+            const studEnroll = enrollment.toString().trim();
+            const recDate = normalizeDate(rec.date);
+            const subMatch =
+              rec.subject === selectedSubject.name ||
+              rec.subject === subjectCode ||
+              rec.subjectCode === subjectCode;
+            return recEnroll === studEnroll && recDate === today && subMatch;
+          });
+
+          if (found) {
+            // Add to set so future checks are instant
+            markedToday.add(subjectCode);
+            markedToday.add(selectedSubject.name);
+          }
+
+          return found;
+        } catch (e) {
+          // If API fails, rely on markedToday Set only
+          return (
+            markedToday.has(subjectCode) ||
+            markedToday.has(selectedSubject.name)
+          );
+        }
       }
-      document.getElementById('cameraStart').style.display = 'block';
-      document.getElementById('cameraView').style.display = 'none';
-      document.getElementById('btnScan').disabled = true;
-      document.getElementById('btnScan').innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-      selectedSubject = null;
-      // Re-render subjects to reflect latest marked state
-      renderSubjects();
-      showAlert('infoAlert', '<i class="fa-solid fa-video-slash"></i> Camera turned off. Select another subject to mark attendance.', 'alert-info');
-    }, 3000);
 
-  } catch(err) {
-    setStatus('red', 'Error: ' + err.message);
-    showAlert('mainAlert', '<i class="fa-solid fa-circle-xmark"></i> Error: ' + err.message, 'alert-warn');
-    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-  }
+      // ── SAVE ATTENDANCE — using GET params ──
+      async function saveAttendance(matchedStudent) {
+        const now = new Date();
+        const date = formatDate(now);
+        const time = now.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
 
-  scanInProgress = false;
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-}
+        const params = new URLSearchParams({
+          action: "markAttendance",
+          enrollment: matchedStudent.enrollment,
+          name: matchedStudent.name,
+          subject: selectedSubject.name,
+          subjectCode: selectedSubject.code,
+          date: date,
+          time: time,
+          status: "Present",
+          department: matchedStudent.department || "",
+          course: matchedStudent.course || student.course || "",
+          semester: matchedStudent.semester || student.semester || "",
+        });
 
-// ── CHECK ALREADY MARKED — local check (fast + reliable) ──
-async function checkAlreadyMarked(enrollment, subjectCode) {
-  try {
-    const today = formatDate(new Date());
+        const url = `${SHEET_URL}?${params.toString()}`;
+        console.log("Marking attendance:", params.toString());
 
-    // Primary check — markedToday Set (fastest)
-    if(markedToday.has(subjectCode)) return true;
-    if(markedToday.has(selectedSubject.name)) return true;
+        const r = await fetch(url);
+        const text = await r.text();
 
-    // Secondary check — fetch fresh from sheet
-    const r = await fetch(`${SHEET_URL}?action=getAllAttendance`);
-    const j = await r.json();
-    const records = j.records || [];
+        console.log("Attendance response:", text);
 
-    const found = records.some(rec => {
-      const recEnroll = rec.enrollment.toString().trim();
-      const studEnroll = enrollment.toString().trim();
-      const recDate   = normalizeDate(rec.date);
-      const subMatch  = rec.subject === selectedSubject.name ||
-                        rec.subject === subjectCode ||
-                        rec.subjectCode === subjectCode;
-      return recEnroll === studEnroll && recDate === today && subMatch;
-    });
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          result = { raw: text };
+        }
 
-    if(found){
-      // Add to set so future checks are instant
-      markedToday.add(subjectCode);
-      markedToday.add(selectedSubject.name);
-    }
+        if (!result.result && !result.success) {
+          throw new Error("Save failed: " + text);
+        }
+        return result;
+      }
 
-    return found;
-  } catch(e) {
-    // If API fails, rely on markedToday Set only
-    return markedToday.has(subjectCode) || markedToday.has(selectedSubject.name);
-  }
-}
+      // ── MANUAL TEST — paste in console or use test button ──
+      async function testSaveAttendance() {
+        const testParams = new URLSearchParams({
+          action: "markAttendance",
+          enrollment: student.enrollment,
+          name: student.name,
+          subject: "TEST Subject",
+          subjectCode: "TEST001",
+          date: formatDate(new Date()),
+          time: "12:00 PM",
+          status: "Present",
+          department: student.department || "IT",
+          course: student.course || "MCA",
+          semester: student.semester || "1st Semester",
+        });
+        const url = `${SHEET_URL}?${testParams.toString()}`;
+        alert("Testing URL:\n" + url + "\n\nCheck console for response...");
+        try {
+          const r = await fetch(url);
+          const text = await r.text();
+          alert("Response: " + text);
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+      }
 
-// ── SAVE ATTENDANCE — using GET params ──
-async function saveAttendance(matchedStudent) {
-  const now  = new Date();
-  const date = formatDate(now);
-  const time = now.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', hour12:true});
+      // ── LOAD MY STATS ──
+      async function loadMyStats() {
+        try {
+          const today = formatDate(new Date());
+          const course = student.course;
+          const semester = student.semester;
+          const enrollment = student.enrollment.toString().trim();
 
-  const params = new URLSearchParams({
-    action:      'markAttendance',
-    enrollment:  matchedStudent.enrollment,
-    name:        matchedStudent.name,
-    subject:     selectedSubject.name,
-    subjectCode: selectedSubject.code,
-    date:        date,
-    time:        time,
-    status:      'Present',
-    department:  matchedStudent.department  || '',
-    course:      matchedStudent.course      || student.course      || '',
-    semester:    matchedStudent.semester    || student.semester    || ''
-  });
+          // Get today's attendance for this student
+          const r = await fetch(`${SHEET_URL}?action=getAllAttendance`);
+          const j = await r.json();
+          const records = j.records || [];
 
-  const url = `${SHEET_URL}?${params.toString()}`;
-  console.log('Marking attendance:', params.toString());
+          // Get all attendance for this student (for overall percentage)
+          const myAttendance = records.filter((rec) => {
+            const recEnroll = rec.enrollment
+              ? rec.enrollment.toString().trim()
+              : "";
+            return recEnroll === enrollment;
+          });
 
-  const r = await fetch(url);
-  const text = await r.text();
+          // Calculate today's stats
+          const todayAttendance = myAttendance.filter((rec) => {
+            const recDate = normalizeDate(rec.date);
+            return recDate === today;
+          });
+          const todayPresent = todayAttendance.length;
 
-  console.log('Attendance response:', text);
+          // Get total classes for today based on timetable
+          const dayIdx = new Date().getDay();
+          const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+          const todayName = dayNames[dayIdx];
+          const semTimetable = (TIMETABLE[course] || {})[semester];
+          const todayTotal = semTimetable
+            ? (semTimetable[todayName] || []).length
+            : 0;
 
-  let result;
-  try { result = JSON.parse(text); } catch(e) { result = {raw: text}; }
+          // Calculate overall percentage
+          const totalClasses = myAttendance.length;
+          const presentCount = myAttendance.filter(
+            (rec) => rec.status === "Present"
+          ).length;
+          const overallPercent =
+            totalClasses > 0
+              ? Math.round((presentCount / totalClasses) * 100)
+              : 0;
 
-  if(!result.result && !result.success){
-    throw new Error('Save failed: ' + text);
-  }
-  return result;
-}
+          // Update UI
+          document.getElementById("statTotal").textContent = todayTotal;
+          document.getElementById("statPresent").textContent = todayPresent;
+          document.getElementById("statPercent").textContent =
+            overallPercent + "%";
+        } catch (e) {
+          console.error("Error loading stats:", e);
+          document.getElementById("statTotal").textContent = "—";
+          document.getElementById("statPresent").textContent = "—";
+          document.getElementById("statPercent").textContent = "—%";
+        }
+      }
 
-// ── MANUAL TEST — paste in console or use test button ──
-async function testSaveAttendance(){
-  const testParams = new URLSearchParams({
-    action: 'markAttendance',
-    enrollment: student.enrollment,
-    name: student.name,
-    subject: 'TEST Subject',
-    subjectCode: 'TEST001',
-    date: formatDate(new Date()),
-    time: '12:00 PM',
-    status: 'Present',
-    department: student.department || 'IT',
-    course: student.course || 'MCA',
-    semester: student.semester || '1st Semester'
-  });
-  const url = `${SHEET_URL}?${testParams.toString()}`;
-  alert('Testing URL:\n' + url + '\n\nCheck console for response...');
-  try {
-    const r = await fetch(url);
-    const text = await r.text();
-    alert('Response: ' + text);
-  } catch(e) {
-    alert('Error: ' + e.message);
-  }
-}
-
-// ── LOAD MY STATS ──
-async function loadMyStats() {
-  try {
-    const today = formatDate(new Date());
-    const course = student.course;
-    const semester = student.semester;
-    const enrollment = student.enrollment.toString().trim();
-
-    // Get today's attendance for this student
-    const r = await fetch(`${SHEET_URL}?action=getAllAttendance`);
-    const j = await r.json();
-    const records = j.records || [];
-
-    // Get all attendance for this student (for overall percentage)
-    const myAttendance = records.filter(rec => {
-      const recEnroll = rec.enrollment ? rec.enrollment.toString().trim() : '';
-      return recEnroll === enrollment;
-    });
-
-    // Calculate today's stats
-    const todayAttendance = myAttendance.filter(rec => {
-      const recDate = normalizeDate(rec.date);
-      return recDate === today;
-    });
-    const todayPresent = todayAttendance.length;
-
-    // Get total classes for today based on timetable
-    const dayIdx = new Date().getDay();
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const todayName = dayNames[dayIdx];
-    const semTimetable = (TIMETABLE[course] || {})[semester];
-    const todayTotal = semTimetable ? (semTimetable[todayName] || []).length : 0;
-
-    // Calculate overall percentage
-    const totalClasses = myAttendance.length;
-    const presentCount = myAttendance.filter(rec => rec.status === 'Present').length;
-    const overallPercent = totalClasses > 0 ? Math.round((presentCount / totalClasses) * 100) : 0;
-
-    // Update UI
-    document.getElementById('statTotal').textContent = todayTotal;
-    document.getElementById('statPresent').textContent = todayPresent;
-    document.getElementById('statPercent').textContent = overallPercent + '%';
-  } catch(e) {
-    console.error('Error loading stats:', e);
-    document.getElementById('statTotal').textContent = '—';
-    document.getElementById('statPresent').textContent = '—';
-    document.getElementById('statPercent').textContent = '—%';
-  }
-}
-
-// ── SHOW RESULT ──
-function showResult(type, title, msg, std) {
-  const icons = { success: '<i class="fa-solid fa-circle-check"></i>', error: '<i class="fa-solid fa-circle-xmark"></i>', warning: '<i class="fa-solid fa-triangle-exclamation"></i>' };
-  let extra = '';
-  if (std && type === 'success') {
-    extra = `
+      // ── SHOW RESULT ──
+      function showResult(type, title, msg, std) {
+        const icons = {
+          success: '<i class="fa-solid fa-circle-check"></i>',
+          error: '<i class="fa-solid fa-circle-xmark"></i>',
+          warning: '<i class="fa-solid fa-triangle-exclamation"></i>',
+        };
+        let extra = "";
+        if (std && type === "success") {
+          extra = `
       <div class="att-info">
-        <div class="att-chip"><div class="lbl">Student</div><div class="val">${std.name}</div></div>
-        <div class="att-chip"><div class="lbl">Enrollment</div><div class="val">${std.enrollment}</div></div>
-        <div class="att-chip"><div class="lbl">Subject</div><div class="val">${selectedSubject.name}</div></div>
-        <div class="att-chip"><div class="lbl">Time</div><div class="val">${new Date().toLocaleTimeString('en-IN')}</div></div>
+        <div class="att-chip"><div class="lbl">Student</div><div class="val">${
+          std.name
+        }</div></div>
+        <div class="att-chip"><div class="lbl">Enrollment</div><div class="val">${
+          std.enrollment
+        }</div></div>
+        <div class="att-chip"><div class="lbl">Subject</div><div class="val">${
+          selectedSubject.name
+        }</div></div>
+        <div class="att-chip"><div class="lbl">Time</div><div class="val">${new Date().toLocaleTimeString(
+          "en-IN"
+        )}</div></div>
       </div>`;
-  }
-  const panel = document.getElementById('resultPanel');
-  const dashboardBtn = type === 'success'
-    ? `<button class="btn-cam btn-primary" onclick="window.location.href='student-dashboard.html'" style="margin-top:16px">
+        }
+        const panel = document.getElementById("resultPanel");
+        const dashboardBtn =
+          type === "success"
+            ? `<button class="btn-cam btn-primary" onclick="window.location.href='student-dashboard.html'" style="margin-top:16px">
         <i class="fa-solid fa-house"></i> Back to Dashboard
       </button>`
-    : `<button class="btn-cam btn-secondary" onclick="window.location.href='student-dashboard.html'" style="margin-top:16px">
+            : `<button class="btn-cam btn-secondary" onclick="window.location.href='student-dashboard.html'" style="margin-top:16px">
         <i class="fa-solid fa-house"></i> Back to Dashboard
       </button>`;
-  panel.innerHTML = `
+        panel.innerHTML = `
     <div class="card-title"><i class="fa-solid fa-clipboard-list"></i> Result</div>
     <div class="result-box ${type}">
       <div class="result-icon">${icons[type]}</div>
@@ -1259,67 +2273,85 @@ function showResult(type, title, msg, std) {
     </div>
     ${extra}
     ${dashboardBtn}`;
-  panel.classList.add('show');
-  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
+        panel.classList.add("show");
+        panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
 
-// ── HELPERS ──
-function setStatus(color, msg) {
-  const dot = document.getElementById('statusDot');
-  const txt = document.getElementById('statusText');
-  dot.className = 'status-dot' + (color === 'red' ? ' red' : color === 'yellow' ? ' yellow' : '');
-  txt.textContent = msg;
-}
+      // ── HELPERS ──
+      function setStatus(color, msg) {
+        const dot = document.getElementById("statusDot");
+        const txt = document.getElementById("statusText");
+        dot.className =
+          "status-dot" +
+          (color === "red" ? " red" : color === "yellow" ? " yellow" : "");
+        txt.textContent = msg;
+      }
 
-function showAlert(id, msg, cls) {
-  const el = document.getElementById(id);
-  el.innerHTML = msg;
-  el.className = 'alert ' + cls + ' show';
-}
-function hideAlert(id) { document.getElementById(id).classList.remove('show'); }
+      function showAlert(id, msg, cls) {
+        const el = document.getElementById(id);
+        el.innerHTML = msg;
+        el.className = "alert " + cls + " show";
+      }
+      function hideAlert(id) {
+        document.getElementById(id).classList.remove("show");
+      }
 
-function showLoading(msg) {
-  document.getElementById('loadingTxt').textContent = msg;
-  document.getElementById('loadingOv').classList.add('show');
-}
-function hideLoading() { document.getElementById('loadingOv').classList.remove('show'); }
+      function showLoading(msg) {
+        document.getElementById("loadingTxt").textContent = msg;
+        document.getElementById("loadingOv").classList.add("show");
+      }
+      function hideLoading() {
+        document.getElementById("loadingOv").classList.remove("show");
+      }
 
-function resetScan() {
-  // Stop camera stream
-  if(stream){ stream.getTracks().forEach(t => t.stop()); stream = null; }
+      function resetScan() {
+        // Stop camera stream
+        if (stream) {
+          stream.getTracks().forEach((t) => t.stop());
+          stream = null;
+        }
 
-  // Go back to Start Camera view
-  document.getElementById('cameraStart').style.display = 'block';
-  document.getElementById('cameraView').style.display = 'none';
+        // Go back to Start Camera view
+        document.getElementById("cameraStart").style.display = "block";
+        document.getElementById("cameraView").style.display = "none";
 
-  document.getElementById('resultPanel').classList.remove('show');
-  hideAlert('mainAlert'); hideAlert('infoAlert');
-  document.getElementById('btnScan').disabled = true;
-  document.getElementById('btnScan').innerHTML = '<i class="fa-solid fa-camera"></i> Scan My Face';
-  scanInProgress = false;
-  selectedSubject = null;
-  document.querySelectorAll('.subj-btn').forEach(b => b.classList.remove('selected'));
-}
+        document.getElementById("resultPanel").classList.remove("show");
+        hideAlert("mainAlert");
+        hideAlert("infoAlert");
+        document.getElementById("btnScan").disabled = true;
+        document.getElementById("btnScan").innerHTML =
+          '<i class="fa-solid fa-camera"></i> Scan My Face';
+        scanInProgress = false;
+        selectedSubject = null;
+        document
+          .querySelectorAll(".subj-btn")
+          .forEach((b) => b.classList.remove("selected"));
+      }
 
-function logout() {
-  localStorage.removeItem('student');
-  window.location.href = 'login.html';
-}
+      function logout() {
+        localStorage.removeItem("student");
+        window.location.href = "login.html";
+      }
 
-// ── HAMBURGER MENU ──
-document.getElementById('hamburger').addEventListener('click', function(){
-  this.classList.toggle('active');
-  document.getElementById('mobileMenu').classList.toggle('show');
-});
-// Close menu when clicking outside
-document.addEventListener('click', function(e){
-  const hamburger = document.getElementById('hamburger');
-  const menu = document.getElementById('mobileMenu');
-  if(!hamburger.contains(e.target) && !menu.contains(e.target)){
-    hamburger.classList.remove('active');
-    menu.classList.remove('show');
-  }
-});
-</script>
-</body>
+      // ── HAMBURGER MENU ──
+      function toggleMenu() {
+        const hamburger = document.getElementById("hamburger");
+        const menu = document.getElementById("mobileMenu");
+        hamburger.classList.toggle("active");
+        menu.classList.toggle("show");
+      }
+      document
+        .getElementById("hamburger")
+        .addEventListener("click", toggleMenu);
+      // Close menu when clicking outside
+      document.addEventListener("click", function (e) {
+        const hamburger = document.getElementById("hamburger");
+        const menu = document.getElementById("mobileMenu");
+        if (!hamburger.contains(e.target) && !menu.contains(e.target)) {
+          hamburger.classList.remove("active");
+          menu.classList.remove("show");
+        }
+      });
+    </script>
+  </body>
 </html>
